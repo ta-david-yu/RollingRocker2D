@@ -14,6 +14,10 @@ class ROLLINGROCKER2D_API URocker : public USceneComponent
 {
 	GENERATED_BODY()
 
+protected:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float m_LocationOnRod = 0;
+
 public:	
 	// Sets default values for this component's properties
 	URocker();

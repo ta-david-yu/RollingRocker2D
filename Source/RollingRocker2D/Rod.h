@@ -15,13 +15,12 @@ class ROLLINGROCKER2D_API URod : public USceneComponent
 	GENERATED_BODY()
 
 public:	
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float Angle = 0;
 
 protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	float m_MinAngle = -45;
-
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	float m_MaxAngle = 45;
