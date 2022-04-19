@@ -4,34 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "Components/SceneComponent.h"
-#include "PaperSprite.h"
-#include "PaperSpriteComponent.h"
-#include "Rod.generated.h"
+#include "EventTrigger.generated.h"
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class ROLLINGROCKER2D_API URod : public USceneComponent
+class ROLLINGROCKER2D_API UEventTrigger : public USceneComponent
 {
 	GENERATED_BODY()
 
 public:	
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-	float Angle = 0;
-
-protected:
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	float m_MinAngle = -45;
-
-	
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	float m_MaxAngle = 45;
-	
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	float m_Length = 200;
-
-public:
 	// Sets default values for this component's properties
-	URod();
+	UEventTrigger();
 
 protected:
 	// Called when the game starts
