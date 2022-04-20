@@ -37,15 +37,23 @@ void URocker::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 
 	if (!m_IsFreeMoveMode)
 	{
-		// Rocker moves based on gravity and velocity
+		// Do acceleration calculation
+		auto gravityDirection = FVector::DownVector;
+		auto projectedAccelerationVector = gravityDirection.ProjectOnTo(m_Rod->GetRodVector());
+		float accelerationDirection = FMath::Sign(projectedAccelerationVector.X);
 
-		// TODO: Gravity acceleration
+		if (accelerationDirection != 0)
+		{
+			// Apply acceleration if the rod is not flat
+			m_CurrentVelocity += accelerationDirection * projectedAccelerationVector.Length() * m_OnRodGravity * DeltaTime;
+		}
 
+		// Move location
 		m_LocationOnRod += m_CurrentVelocity * DeltaTime;
 	}
 
 	// Update the actual world location based on location on rod
-	FVector worldLocation = m_Rod->GetForwardVector() * m_LocationOnRod;
+	FVector worldLocation = m_Rod->GetRodVector() * m_LocationOnRod;
 }
 
 

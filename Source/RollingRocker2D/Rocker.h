@@ -17,8 +17,8 @@ class ROLLINGROCKER2D_API URocker : public USceneComponent
 	GENERATED_BODY()
 
 protected:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	URod* m_Rod;
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	URod* m_Rod = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float m_LocationOnRod = 0;
@@ -45,6 +45,16 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
+
+	UFUNCTION(BlueprintCallable)
+	bool IsFreeMoveMode() const { return m_IsFreeMoveMode; }
+
+	UFUNCTION(BlueprintCallable)
+	void ActivateFreeMoveMode() { m_IsFreeMoveMode = true; }
+
+	UFUNCTION(BlueprintCallable)
+	void DeactivateFreeMoveMode() { m_IsFreeMoveMode = false; }
+
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	

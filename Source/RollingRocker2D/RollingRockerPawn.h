@@ -15,10 +15,10 @@ class ROLLINGROCKER2D_API ARollingRockerPawn : public APawn
 
 public:
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-	URocker* Rocker;
+	URocker* Rocker = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-	URod* Rod;
+	URod* Rod = nullptr;
 
 protected:
 	// Sets default values for this pawn's properties

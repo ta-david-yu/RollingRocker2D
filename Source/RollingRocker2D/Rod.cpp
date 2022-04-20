@@ -32,3 +32,26 @@ void URod::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTi
 	// ...
 }
 
+void URod::MoveLeftEnd(float scalar, float deltaTime)
+{
+	float scalarValue = FMath::Abs(scalar);
+	float clampedScalarValue = FMath::Clamp(scalarValue, 0, 1);
+	float clampedScalar = FMath::Sign(scalar) * clampedScalarValue;
+
+	m_LeftEndHeight += clampedScalar * deltaTime * m_EndMaxSpeed;
+	m_LeftEndHeight = FMath::Clamp(m_LeftEndHeight, -m_LeftEndMovableRange * 0.5f, m_LeftEndMovableRange * 0.5f);
+
+	OnLeftEndLocationChanged.Broadcast(GetLeftEndLocation());
+}
+
+void URod::MoveRightEnd(float scalar, float deltaTime)
+{
+	float scalarValue = FMath::Abs(scalar);
+	float clampedScalarValue = FMath::Clamp(scalarValue, 0, 1);
+	float clampedScalar = FMath::Sign(scalar) * clampedScalarValue;
+
+	m_RightEndHeight += clampedScalar * deltaTime * m_EndMaxSpeed;
+	m_RightEndHeight = FMath::Clamp(m_RightEndHeight, -m_RightEndMovableRange * 0.5f, m_RightEndMovableRange * 0.5f);
+
+	OnRightEndLocationChanged.Broadcast(GetRightEndLocation());
+}
