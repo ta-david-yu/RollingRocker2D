@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Math/Vector2D.h"
 #include "Components/SceneComponent.h"
+#include "Components/SphereComponent.h"
 #include "Rod.h"
 #include "PaperSprite.h"
 #include "PaperSpriteComponent.h"
@@ -19,6 +20,9 @@ class ROLLINGROCKER2D_API URocker : public USceneComponent
 protected:
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	URod* m_Rod = nullptr;
+
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	USphereComponent* m_SphereCollision = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float m_LocationOnRod = 0;
@@ -54,19 +58,25 @@ public:
 	bool IsFreeMoveMode() const { return m_IsFreeMoveMode; }
 
 	UFUNCTION(BlueprintCallable)
-	void ActivateFreeMoveMode() { m_IsFreeMoveMode = true; }
+	void ActivateFreeMoveMode();
 
 	UFUNCTION(BlueprintCallable)
-	void DeactivateFreeMoveMode() { m_IsFreeMoveMode = false; }
+	void DeactivateFreeMoveMode();
 
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	
 	/**
-	  * Move the rocker manually on the rod with the speed value of m_FreeMoveSpeed
+	  * Input move the rocker in free move mode manner
 	  * @param	moveDirection: 1 means right, -1 means left
-	  * @param	deltaTime
 	  */
 	UFUNCTION(BlueprintCallable)
 	void FreeMove(float moveDirection);
+
+	/**
+	  * Move the rocker manually on the rod with clamping. 
+	  * Return the delta value after clamping. If the new location exceeded the limit, the return value will be different from the input value.
+	  */
+	UFUNCTION(BlueprintCallable)
+	float InstantMoveClamp(float locationDelta);
 };

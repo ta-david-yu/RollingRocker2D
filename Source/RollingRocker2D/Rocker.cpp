@@ -36,12 +36,15 @@ void URocker::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 	}
 
 	FVector normalizedRodDirectionVector = m_Rod->GetRodVector().GetUnsafeNormal();
+	FVector worldLocation = GetComponentLocation();
+	float locationOnRodDelta = 0;
 
+	// Do playing input handling
 	if (m_IsFreeMoveMode)
 	{
 		if (!FMath::IsNearlyEqual(m_FreeMoveDirectionBuffer, 0))
 		{
-			m_LocationOnRod += m_FreeMoveDirectionBuffer * m_FreeMoveSpeed * DeltaTime;
+			locationOnRodDelta = m_FreeMoveDirectionBuffer * m_FreeMoveSpeed * DeltaTime;
 			m_FreeMoveDirectionBuffer = 0;
 		}
 	}
@@ -59,15 +62,105 @@ void URocker::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 		}
 
 		// Move location
-		m_LocationOnRod += m_CurrentVelocity * DeltaTime;
+		locationOnRodDelta = m_CurrentVelocity * DeltaTime;
 	}
 
+	bool isSqrtMaxExtentCalculated = false;
+	float maxProjectedExtentOnRod = 0; // This value is only valid if isSqrtMaxExtentCalculated is true
+
+
+	if (FMath::Abs(locationOnRodDelta) > 0)
+	{
+		// Move
+		float actualAppliedDelta = InstantMoveClamp(locationOnRodDelta);
+		if (actualAppliedDelta != locationOnRodDelta)
+		{
+			// Hit the wall / limit, reset velocity!
+			m_CurrentVelocity = 0;
+		}
+	}
+
+	// If rocker is on an end of the rod and the rod end moves toward its origin,
+	// the rod length in x axis would be shorter, which will limit rocker's location.
+	// In that case, we want to push rocker inside a bit.
+	/*
+	float rodAreaExtent = m_Rod->GetMovableAreaWidth() * 0.5f;
+	FVector rodAreaOriginToRightEndOrigin = m_Rod->GetForwardVector() * rodAreaExtent;
+	float sqrMaxProjectedExtentOnRod = rodAreaOriginToRightEndOrigin.ProjectOnTo(normalizedRodDirectionVector).SquaredLength();
+	float sqrLocationOnRod = m_LocationOnRod * m_LocationOnRod;
+	if (sqrLocationOnRod > sqrMaxProjectedExtentOnRod)
+	{
+
+
+		// Location on rod magnitude has exceeded the current
+		// ...
+	}*/
+
 	// Update the actual world location based on location on rod
-	FVector worldLocation = normalizedRodDirectionVector * m_LocationOnRod;
+	//FVector worldLocation = normalizedRodDirectionVector * m_LocationOnRod;
 }
 
+void URocker::ActivateFreeMoveMode() 
+{ 
+	m_IsFreeMoveMode = true;
+	m_CurrentVelocity = 0;
+}
+
+void URocker::DeactivateFreeMoveMode() 
+{ 
+	m_IsFreeMoveMode = false;
+	m_CurrentVelocity = 0;
+}
 
 void URocker::FreeMove(float moveDirection)
 {
 	m_FreeMoveDirectionBuffer = FMath::Clamp(moveDirection, -1, 1);
+}
+
+float URocker::InstantMoveClamp(float locationDelta)
+{
+	if (!m_SphereCollision->IsValidLowLevelFast())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("Rocker's m_SphereCollision is not valid."));
+		return 0;
+	}
+
+	float newLocationOnRod = m_LocationOnRod + locationDelta;
+
+	FVector normalizedRodDirectionVector = m_Rod->GetRodVector().GetUnsafeNormal();
+
+	/*
+	float rodAreaExtent = m_Rod->GetMovableAreaWidth() * 0.5f;
+	FVector rodAreaOriginToRightEndOrigin = m_Rod->GetForwardVector() * rodAreaExtent;
+	
+	float sqrMaxProjectedExtentOnRod = rodAreaOriginToRightEndOrigin.ProjectOnTo(normalizedRodDirectionVector).SquaredLength();
+	float sqrNewLocationOnRod = newLocationOnRod * newLocationOnRod;
+
+	if (sqrNewLocationOnRod > sqrMaxProjectedExtentOnRod)
+	{
+		// New location on rod magnitude has exceeded the current max extent,
+		// We want to clamp locationOnRodDelta before we apply it to the actual location variable.
+		float maxProjectedExtentOnRod = FMath::Sqrt(sqrMaxProjectedExtentOnRod);
+		float newLocationOnRodValue = FMath::Abs(newLocationOnRod);
+
+		float exceededAmount = newLocationOnRodValue - maxProjectedExtentOnRod;
+		float exceededAountAdjustment = -FMath::Sign(newLocationOnRod) * exceededAmount;
+		locationDelta += exceededAountAdjustment;
+	}*/
+
+	float rodLengthExtent = m_Rod->GetRodVector().Length() * 0.5f - m_SphereCollision->GetScaledSphereRadius();
+	float newLocationOnRodValue = FMath::Abs(newLocationOnRod);
+	if (newLocationOnRodValue > rodLengthExtent)
+	{
+		float exceededAmount = newLocationOnRodValue - rodLengthExtent;
+		float exceededAountAdjustment = -FMath::Sign(newLocationOnRod) * exceededAmount;
+		locationDelta += exceededAountAdjustment;
+	}
+
+	m_LocationOnRod += locationDelta;
+
+	// Update the actual world location based on location on rod
+	
+
+	return locationDelta;
 }

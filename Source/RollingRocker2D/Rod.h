@@ -65,6 +65,9 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable)
+	float GetMovableAreaWidth() const { return m_MovableAreaWidth; }
+
+	UFUNCTION(BlueprintCallable)
 	float GetLeftEndHeight() const { return m_LeftEndHeight; }
 
 	UFUNCTION(BlueprintCallable)
@@ -78,6 +81,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	FVector GetRightEndLocation() const { return GetComponentLocation() + FVector::ForwardVector * m_MovableAreaWidth * 0.5f + FVector::UpVector * m_RightEndHeight; }
+
+	UFUNCTION(BlueprintCallable)
+	FVector GetRodCenterLocation() const { return (GetLeftEndLocation() + GetRightEndLocation()) * 0.5f; }
 
 	UFUNCTION(BlueprintCallable)
 	FVector GetRodVector() const { return GetRightEndLocation() - GetLeftEndLocation(); }
