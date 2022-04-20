@@ -35,11 +35,21 @@ void URocker::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 		return;
 	}
 
-	if (!m_IsFreeMoveMode)
+	FVector normalizedRodDirectionVector = m_Rod->GetRodVector().GetUnsafeNormal();
+
+	if (m_IsFreeMoveMode)
+	{
+		if (!FMath::IsNearlyEqual(m_FreeMoveDirectionBuffer, 0))
+		{
+			m_LocationOnRod += m_FreeMoveDirectionBuffer * m_FreeMoveSpeed * DeltaTime;
+			m_FreeMoveDirectionBuffer = 0;
+		}
+	}
+	else
 	{
 		// Do acceleration calculation
 		auto gravityDirection = FVector::DownVector;
-		auto projectedAccelerationVector = gravityDirection.ProjectOnTo(m_Rod->GetRodVector());
+		auto projectedAccelerationVector = gravityDirection.ProjectOnTo(normalizedRodDirectionVector);
 		float accelerationDirection = FMath::Sign(projectedAccelerationVector.X);
 
 		if (accelerationDirection != 0)
@@ -53,19 +63,11 @@ void URocker::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 	}
 
 	// Update the actual world location based on location on rod
-	FVector worldLocation = m_Rod->GetRodVector() * m_LocationOnRod;
+	FVector worldLocation = normalizedRodDirectionVector * m_LocationOnRod;
 }
 
 
-void URocker::FreeMove(float moveDirection, float deltaTime)
+void URocker::FreeMove(float moveDirection)
 {
-	if (!m_Rod->IsValidLowLevelFast())
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("Rocker's m_Rod is not valid."));
-		return;
-	}
-
-	// Update location on rod
-	float moveDirectionSign = FMath::Sign(moveDirection);
-	m_LocationOnRod += moveDirectionSign * m_FreeMoveSpeed * deltaTime;
+	m_FreeMoveDirectionBuffer = FMath::Clamp(moveDirection, -1, 1);
 }

@@ -8,6 +8,7 @@
 #include "PaperSpriteComponent.h"
 #include "Rod.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRodLocationChangedEvent, FVector, NewLeftLocation, FVector, NewRightLocation);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRodEndLocationChangedEvent, FVector, NewLocation);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -44,6 +45,16 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FRodEndLocationChangedEvent OnRightEndLocationChanged;
 
+	UPROPERTY(BlueprintAssignable)
+	FRodLocationChangedEvent OnRodLocationChanged;
+
+private:
+	UPROPERTY(VisibleAnywhere)
+	float m_LeftEndMoveBuffer = 0;
+
+	UPROPERTY(VisibleAnywhere)
+	float m_RightEndMoveBuffer = 0;
+
 public:
 	// Sets default values for this component's properties
 	URod();
@@ -72,8 +83,8 @@ public:
 	FVector GetRodVector() const { return GetRightEndLocation() - GetLeftEndLocation(); }
 
 	UFUNCTION(BlueprintCallable)
-	void MoveLeftEnd(float scalar, float deltaTime);
+	void MoveLeftEnd(float scalar);
 	
 	UFUNCTION(BlueprintCallable)
-	void MoveRightEnd(float scalar, float deltaTime);
+	void MoveRightEnd(float scalar);
 };

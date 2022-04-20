@@ -28,30 +28,42 @@ void URod::BeginPlay()
 void URod::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	
+	bool leftEndMoved = false;
+	bool rightEndMoved = false;
 
-	// ...
+	if (!FMath::IsNearlyEqual(m_LeftEndMoveBuffer, 0))
+	{
+		m_LeftEndHeight += m_LeftEndMoveBuffer * DeltaTime * m_EndMaxSpeed;
+		m_LeftEndHeight = FMath::Clamp(m_LeftEndHeight, -m_LeftEndMovableRange * 0.5f, m_LeftEndMovableRange * 0.5f);
+		m_LeftEndMoveBuffer = 0;
+
+		leftEndMoved = true;
+		OnLeftEndLocationChanged.Broadcast(GetLeftEndLocation());
+	}
+
+	if (!FMath::IsNearlyEqual(m_RightEndMoveBuffer, 0))
+	{
+		m_RightEndHeight += m_RightEndMoveBuffer * DeltaTime * m_EndMaxSpeed;
+		m_RightEndHeight = FMath::Clamp(m_RightEndHeight, -m_RightEndMovableRange * 0.5f, m_RightEndMovableRange * 0.5f);
+		m_RightEndMoveBuffer = 0;
+
+		rightEndMoved = true;
+		OnRightEndLocationChanged.Broadcast(GetRightEndLocation());
+	}
+
+	if (leftEndMoved || rightEndMoved)
+	{
+		OnRodLocationChanged.Broadcast(GetLeftEndLocation(), GetRightEndLocation());
+	}
 }
 
-void URod::MoveLeftEnd(float scalar, float deltaTime)
+void URod::MoveLeftEnd(float scalar)
 {
-	float scalarValue = FMath::Abs(scalar);
-	float clampedScalarValue = FMath::Clamp(scalarValue, 0, 1);
-	float clampedScalar = FMath::Sign(scalar) * clampedScalarValue;
-
-	m_LeftEndHeight += clampedScalar * deltaTime * m_EndMaxSpeed;
-	m_LeftEndHeight = FMath::Clamp(m_LeftEndHeight, -m_LeftEndMovableRange * 0.5f, m_LeftEndMovableRange * 0.5f);
-
-	OnLeftEndLocationChanged.Broadcast(GetLeftEndLocation());
+	m_LeftEndMoveBuffer = FMath::Clamp(scalar, -1, 1);
 }
 
-void URod::MoveRightEnd(float scalar, float deltaTime)
+void URod::MoveRightEnd(float scalar)
 {
-	float scalarValue = FMath::Abs(scalar);
-	float clampedScalarValue = FMath::Clamp(scalarValue, 0, 1);
-	float clampedScalar = FMath::Sign(scalar) * clampedScalarValue;
-
-	m_RightEndHeight += clampedScalar * deltaTime * m_EndMaxSpeed;
-	m_RightEndHeight = FMath::Clamp(m_RightEndHeight, -m_RightEndMovableRange * 0.5f, m_RightEndMovableRange * 0.5f);
-
-	OnRightEndLocationChanged.Broadcast(GetRightEndLocation());
+	m_RightEndMoveBuffer = FMath::Clamp(scalar, -1, 1);
 }

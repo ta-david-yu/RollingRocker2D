@@ -36,6 +36,10 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	bool m_IsFreeMoveMode = false;
 
+private:
+	UPROPERTY(VisibleAnywhere)
+	float m_FreeMoveDirectionBuffer = 0;
+
 public:	
 	// Sets default values for this component's properties
 	URocker();
@@ -64,5 +68,5 @@ public:
 	  * @param	deltaTime
 	  */
 	UFUNCTION(BlueprintCallable)
-	void FreeMove(float moveDirection, float deltaTime);
+	void FreeMove(float moveDirection);
 };
