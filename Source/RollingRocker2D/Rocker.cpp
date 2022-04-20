@@ -29,6 +29,35 @@ void URocker::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	if (!m_Rod->IsValidLowLevelFast())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("Rocker's m_Rod is not valid."));
+		return;
+	}
+
+	if (!m_IsFreeMoveMode)
+	{
+		// Rocker moves based on gravity and velocity
+
+		// TODO: Gravity acceleration
+
+		m_LocationOnRod += m_CurrentVelocity * DeltaTime;
+	}
+
+	// Update the actual world location based on location on rod
+	FVector worldLocation = m_Rod->GetForwardVector() * m_LocationOnRod;
 }
 
+
+void URocker::FreeMove(float moveDirection, float deltaTime)
+{
+	if (!m_Rod->IsValidLowLevelFast())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("Rocker's m_Rod is not valid."));
+		return;
+	}
+
+	// Update location on rod
+	float moveDirectionSign = FMath::Sign(moveDirection);
+	m_LocationOnRod += moveDirectionSign * m_FreeMoveSpeed * deltaTime;
+}

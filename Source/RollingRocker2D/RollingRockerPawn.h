@@ -14,16 +14,13 @@ class ROLLINGROCKER2D_API ARollingRockerPawn : public APawn
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	URocker* Rocker;
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	URod* Rod;
 
 protected:
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	USceneComponent* m_Root;
-
 	// Sets default values for this pawn's properties
 	ARollingRockerPawn();
 
