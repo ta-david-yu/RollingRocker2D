@@ -58,7 +58,17 @@ void URocker::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 		if (accelerationDirection != 0)
 		{
 			// Apply acceleration if the rod is not flat
-			m_CurrentVelocity += accelerationDirection * projectedAccelerationVector.Length() * m_OnRodGravity * DeltaTime;
+			float acceleration = accelerationDirection * projectedAccelerationVector.Length() * m_OnRodGravity * DeltaTime;
+			float newVelocity = m_CurrentVelocity + acceleration;
+			float newSpeed = FMath::Abs(newVelocity);
+			if (newSpeed > m_ConstrainedMaxSpeed)
+			{
+				// New velocity value exceeds the max speed, clamp it
+				float accelerationAdjustment = newSpeed - m_ConstrainedMaxSpeed;
+				acceleration -= accelerationAdjustment * FMath::Sign(newVelocity);
+			}
+
+			m_CurrentVelocity += acceleration;
 		}
 
 		// Move location

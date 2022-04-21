@@ -24,21 +24,29 @@ protected:
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	USphereComponent* m_SphereCollision = nullptr;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Rocker Movement|Constrained Mode")
+	float m_OnRodGravity = 98.0f;
+	
+	UPROPERTY
+	(
+		BlueprintReadOnly, 
+		EditAnywhere, 
+		Category = "Rocker Movement|Constrained Mode",
+		meta = (ClampMin = "0", ClampMax = "200.0", UIMin = "0", UIMax = "200.0")
+	)
+	float m_ConstrainedMaxSpeed = 100.0f;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Rocker Movement|FreeMove Mode")
+	float m_FreeMoveSpeed = 100.0f;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	float m_LocationOnRod = 0;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	float m_OnRodGravity = 9.8f;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	float m_FreeMoveSpeed = 10.0f;
-
-	// Velocity in constrained mode (non-free move mode)
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	float m_CurrentVelocity = 0;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	bool m_IsFreeMoveMode = false;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	float m_CurrentVelocity = 0;
 
 private:
 	UPROPERTY(VisibleAnywhere)
