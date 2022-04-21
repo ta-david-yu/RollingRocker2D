@@ -14,7 +14,18 @@ ARollingRockerPawn::ARollingRockerPawn()
 void ARollingRockerPawn::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	if (!Rod->IsValidLowLevelFast())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("RollingRockerPawn's Rod is not valid."));
+		return;
+	}
+
+	if (!Rocker->IsValidLowLevelFast())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("RollingRockerPawn's Rocker is not valid."));
+		return;
+	}
 
 	// Register Events
 	Rod->OnRodLocationChanged.AddDynamic(this, &ARollingRockerPawn::HandleOnRodLocationChanged);
@@ -36,10 +47,10 @@ void ARollingRockerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 void ARollingRockerPawn::HandleOnRodLocationChanged(FVector leftEndLocation, FVector rightEndLocation)
 {
-	// Location
+	// Rod appearance location
 	FVector centerLocation = (leftEndLocation + rightEndLocation) * 0.5f;
 
-	// Rotation
+	// Rod appearance rotation
 	FVector normalizedRodVector = (rightEndLocation - leftEndLocation).GetUnsafeNormal();
 	FVector rodForward = Rod->GetForwardVector().GetUnsafeNormal();
 
@@ -54,4 +65,26 @@ void ARollingRockerPawn::HandleOnRodLocationChanged(FVector leftEndLocation, FVe
 	FRotator rotation = FQuat(SafeAxis, angleSign * radianAngle).Rotator();
 
 	RodAppearance->SetWorldLocationAndRotationNoPhysics(centerLocation, rotation);
+
+	// Do Rocker location capping in case Rod length shrinks during its movement
+	float rockerLocationOnRod = Rocker->GetLocationOnRod();
+	float rockerLocationSign = FMath::Sign(rockerLocationOnRod);
+	float rockerEdgeLocationOnRod = Rocker->GetLocationOnRod() + rockerLocationSign * Rocker->GetCollisionRadius();
+	float sqrRockerEdgeLocationOnRod = rockerEdgeLocationOnRod * rockerEdgeLocationOnRod;
+
+	float sqrRodLength = Rod->GetRodVector().SquaredLength();
+	float sqrRodHalfLength = sqrRodLength / 4;
+
+	if (sqrRockerEdgeLocationOnRod > sqrRodHalfLength)
+	{
+		// Rocker location is outside the rod length, do adjustment move
+		float exceededAmount = rockerEdgeLocationOnRod - FMath::Sqrt(sqrRodLength) * 0.5f;
+		float adjustmentDelta = -exceededAmount * rockerLocationSign;
+
+		Rocker->InstantMoveClamp(adjustmentDelta);
+	}
+	else
+	{
+		Rocker->SnapWorldLocationToRod();
+	}
 }

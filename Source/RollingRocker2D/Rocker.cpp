@@ -87,34 +87,13 @@ void URocker::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 	{
 		// Move
 		float actualAppliedDelta = InstantMoveClamp(locationOnRodDelta);
+		RotateWithLocationDelta(actualAppliedDelta);
 		if (actualAppliedDelta != locationOnRodDelta)
 		{
 			// Hit the wall / limit, reset velocity!
 			m_CurrentVelocity = 0;
 		}
 	}
-
-
-	// We want to move this to Rod logic when ends are changed
-	
-	// If rocker is on an end of the rod and the rod end moves toward its origin,
-	// the rod length in x axis would be shorter, which will limit rocker's location.
-	// In that case, we want to push rocker inside a bit.
-	/*
-	float rodAreaExtent = m_Rod->GetMovableAreaWidth() * 0.5f;
-	FVector rodAreaOriginToRightEndOrigin = m_Rod->GetForwardVector() * rodAreaExtent;
-	float sqrMaxProjectedExtentOnRod = rodAreaOriginToRightEndOrigin.ProjectOnTo(normalizedRodDirectionVector).SquaredLength();
-	float sqrLocationOnRod = m_LocationOnRod * m_LocationOnRod;
-	if (sqrLocationOnRod > sqrMaxProjectedExtentOnRod)
-	{
-
-
-		// Location on rod magnitude has exceeded the current
-		// ...
-	}*/
-
-	// Update the actual world location based on location on rod
-	//FVector worldLocation = normalizedRodDirectionVector * m_LocationOnRod;
 }
 
 void URocker::ActivateFreeMoveMode() 
@@ -134,6 +113,15 @@ void URocker::FreeMove(float moveDirection)
 	m_FreeMoveDirectionBuffer = FMath::Clamp(moveDirection, -1, 1);
 }
 
+void URocker::RotateWithLocationDelta(float locationDelta)
+{
+	// Update rotation based on locationDelta
+	float radianAngle = -locationDelta / (GetCollisionRadius());
+	FVector SafeAxis = FVector::LeftVector.GetSafeNormal(); // Make sure axis is unit length
+	FRotator rotation = FQuat(SafeAxis, radianAngle).Rotator();
+	AddLocalRotation(rotation);
+}
+
 float URocker::InstantMoveClamp(float locationDelta)
 {
 	if (!m_Rod->IsValidLowLevelFast())
@@ -149,7 +137,7 @@ float URocker::InstantMoveClamp(float locationDelta)
 	}
 
 	float newLocationOnRod = m_LocationOnRod + locationDelta;
-	float rockerRadius = m_SphereCollision->GetScaledSphereRadius();
+	float rockerRadius = GetCollisionRadius();
 	float rodLengthExtent = m_Rod->GetRodVector().Length() * 0.5f - rockerRadius;
 	float newLocationOnRodValue = FMath::Abs(newLocationOnRod);
 	if (newLocationOnRodValue > rodLengthExtent)
@@ -162,22 +150,18 @@ float URocker::InstantMoveClamp(float locationDelta)
 	m_LocationOnRod += locationDelta;
 
 	// Update the actual world location based on location on rod
+	SnapWorldLocationToRod();
+
+	return locationDelta;
+}
+
+void URocker::SnapWorldLocationToRod()
+{
 	FVector normalizedRodVector = m_Rod->GetRodVector().GetSafeNormal();
 	FVector rodCenterToWorldLocation = normalizedRodVector * m_LocationOnRod;
 	FVector rodCenter = m_Rod->GetRodCenterLocation();
-	FVector rockerWorldLocation = rodCenter + rodCenterToWorldLocation + FVector::UpVector * rockerRadius;
-
+	FVector rockerWorldLocation = rodCenter + rodCenterToWorldLocation + FVector::UpVector * GetCollisionRadius();
 	SetWorldLocation(rockerWorldLocation);
-
-
-	// Update rotation based on locationDelta
-	float radianAngle = -locationDelta / (rockerRadius);
-	FVector SafeAxis = FVector::LeftVector.GetSafeNormal(); // Make sure axis is unit length
-	FRotator rotation = FQuat(SafeAxis, radianAngle).Rotator();
-
-	AddLocalRotation(rotation);
-	
-	return locationDelta;
 }
 
 float URocker::GetEvaluatedGravityFromTimeToReachMaxSpeed(float rodMovableAreaWidth, float rodEndMovableRange)

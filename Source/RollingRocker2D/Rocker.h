@@ -66,6 +66,11 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
+	UFUNCTION(BlueprintCallable)
+	float GetCollisionRadius() const { return m_SphereCollision->GetScaledSphereRadius(); }
+
+	UFUNCTION(BlueprintCallable)
+	float GetLocationOnRod() const { return m_LocationOnRod; }
 
 	UFUNCTION(BlueprintCallable)
 	bool IsFreeMoveMode() const { return m_IsFreeMoveMode; }
@@ -87,11 +92,20 @@ public:
 	void FreeMove(float moveDirection);
 
 	/**
+	  * Rotate the transform as if Rocker has moved the given locationDelta value.
+	  */
+	UFUNCTION(BlueprintCallable)
+	void RotateWithLocationDelta(float locationDelta);
+
+	/**
 	  * Move the rocker manually on the rod with clamping. 
 	  * Return the delta value after clamping. If the new location exceeded the limit, the return value will be different from the input value.
 	  */
 	UFUNCTION(BlueprintCallable)
 	float InstantMoveClamp(float locationDelta);
+
+	UFUNCTION(BlueprintCallable)
+	void SnapWorldLocationToRod();
 
 	UFUNCTION(BlueprintCallable)
 	float GetEvaluatedGravityFromTimeToReachMaxSpeed(float rodMovableAreaWidth, float rodEndMovableRange);
