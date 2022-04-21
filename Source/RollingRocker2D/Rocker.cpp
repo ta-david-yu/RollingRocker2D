@@ -42,9 +42,9 @@ void URocker::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 	// Do playing input handling
 	if (m_IsFreeMoveMode)
 	{
+		m_CurrentVelocity = m_FreeMoveDirectionBuffer * m_FreeMoveSpeed;
 		if (!FMath::IsNearlyEqual(m_FreeMoveDirectionBuffer, 0))
 		{
-			locationOnRodDelta = m_FreeMoveDirectionBuffer * m_FreeMoveSpeed * DeltaTime;
 			m_FreeMoveDirectionBuffer = 0;
 		}
 	}
@@ -70,10 +70,10 @@ void URocker::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 
 			m_CurrentVelocity += acceleration;
 		}
-
-		// Move location
-		locationOnRodDelta = m_CurrentVelocity * DeltaTime;
 	}
+
+	// Move location
+	locationOnRodDelta = m_CurrentVelocity * DeltaTime;
 
 	bool isSqrtMaxExtentCalculated = false;
 	float maxProjectedExtentOnRod = 0; // This value is only valid if isSqrtMaxExtentCalculated is true
