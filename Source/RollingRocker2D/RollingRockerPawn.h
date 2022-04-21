@@ -20,6 +20,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	URod* Rod = nullptr;
 
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	USceneComponent* RodAppearance = nullptr;
+
 protected:
 	// Sets default values for this pawn's properties
 	ARollingRockerPawn();
@@ -34,5 +37,8 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
+private:
+	
+	UFUNCTION()
+	void HandleOnRodLocationChanged(FVector leftEndLocation, FVector rightEndLocation);
 };
