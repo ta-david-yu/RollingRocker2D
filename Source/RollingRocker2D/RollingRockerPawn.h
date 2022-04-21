@@ -40,5 +40,5 @@ public:
 private:
 	
 	UFUNCTION()
-	void HandleOnRodLocationChanged(FVector leftEndLocation, FVector rightEndLocation);
+	void HandleOnRodLocationChanged(FRodLocationChangedEventData& eventData);
 };

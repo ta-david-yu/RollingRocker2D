@@ -116,7 +116,7 @@ void URocker::FreeMove(float moveDirection)
 void URocker::RotateWithLocationDelta(float locationDelta)
 {
 	// Update rotation based on locationDelta
-	float radianAngle = -locationDelta / (GetCollisionRadius());
+	double radianAngle = -locationDelta / (GetCollisionRadius());
 	FVector SafeAxis = FVector::LeftVector.GetSafeNormal(); // Make sure axis is unit length
 	FRotator rotation = FQuat(SafeAxis, radianAngle).Rotator();
 	AddLocalRotation(rotation);

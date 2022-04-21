@@ -8,7 +8,25 @@
 #include "PaperSpriteComponent.h"
 #include "Rod.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRodLocationChangedEvent, FVector, NewLeftLocation, FVector, NewRightLocation);
+USTRUCT(BlueprintType)
+struct FRodLocationChangedEventData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVector OldLeftLocation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVector OldRightLocation;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVector NewLeftLocation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVector NewRightLocation;
+};
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRodLocationChangedEvent, FRodLocationChangedEventData&, rodLocationChangedData);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRodEndLocationChangedEvent, FVector, NewLocation);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )

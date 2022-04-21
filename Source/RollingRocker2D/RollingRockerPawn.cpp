@@ -45,13 +45,13 @@ void ARollingRockerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 }
 
-void ARollingRockerPawn::HandleOnRodLocationChanged(FVector leftEndLocation, FVector rightEndLocation)
+void ARollingRockerPawn::HandleOnRodLocationChanged(FRodLocationChangedEventData& eventData)
 {
 	// Rod appearance location
-	FVector centerLocation = (leftEndLocation + rightEndLocation) * 0.5f;
+	FVector centerLocation = (eventData.NewLeftLocation + eventData.NewRightLocation) * 0.5f;
 
 	// Rod appearance rotation
-	FVector normalizedRodVector = (rightEndLocation - leftEndLocation).GetUnsafeNormal();
+	FVector normalizedRodVector = (eventData.NewRightLocation - eventData.NewLeftLocation).GetUnsafeNormal();
 	FVector rodForward = Rod->GetForwardVector().GetUnsafeNormal();
 
 	double dot = FVector::DotProduct(rodForward, normalizedRodVector);
@@ -78,10 +78,12 @@ void ARollingRockerPawn::HandleOnRodLocationChanged(FVector leftEndLocation, FVe
 	if (sqrRockerEdgeLocationOnRod > sqrRodHalfLength)
 	{
 		// Rocker location is outside the rod length, do adjustment move
-		float exceededAmount = rockerEdgeLocationOnRod - FMath::Sqrt(sqrRodLength) * 0.5f;
+		float rodHalfLength = FMath::Sqrt(sqrRodLength) * 0.5f;
+		float exceededAmount = FMath::Abs(rockerEdgeLocationOnRod) - rodHalfLength;
 		float adjustmentDelta = -exceededAmount * rockerLocationSign;
 
-		Rocker->InstantMoveClamp(adjustmentDelta);
+		float actualAppliedDelta = Rocker->InstantMoveClamp(adjustmentDelta);
+		Rocker->RotateWithLocationDelta(actualAppliedDelta);
 	}
 	else
 	{

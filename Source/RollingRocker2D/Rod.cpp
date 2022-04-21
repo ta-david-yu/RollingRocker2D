@@ -32,6 +32,9 @@ void URod::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTi
 	bool leftEndMoved = false;
 	bool rightEndMoved = false;
 
+	FVector oldLeftLocation = GetLeftEndLocation();
+	FVector oldRightLocation = GetRightEndLocation();
+
 	if (!FMath::IsNearlyEqual(m_LeftEndMoveBuffer, 0))
 	{
 		m_LeftEndHeight += m_LeftEndMoveBuffer * DeltaTime * m_EndMaxSpeed;
@@ -54,7 +57,13 @@ void URod::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTi
 
 	if (leftEndMoved || rightEndMoved)
 	{
-		OnRodLocationChanged.Broadcast(GetLeftEndLocation(), GetRightEndLocation());
+		FRodLocationChangedEventData data { };
+		data.OldLeftLocation = oldLeftLocation;
+		data.OldRightLocation = oldRightLocation;
+		data.NewLeftLocation = GetLeftEndLocation();
+		data.NewRightLocation = GetRightEndLocation();
+
+		OnRodLocationChanged.Broadcast(data);
 	}
 }
 
