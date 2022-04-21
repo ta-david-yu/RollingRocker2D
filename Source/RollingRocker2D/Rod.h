@@ -19,11 +19,7 @@ class ROLLINGROCKER2D_API URod : public USceneComponent
 protected:
 	// If the value is 50, meaning the movable location ranging from -25 to 25
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (ClampMin = "0", ClampMax = "100.0", UIMin = "0", UIMax = "100.0"))
-	float m_LeftEndMovableRange = 50;
-	
-	// If the value is 50, meaning the movable location ranging from -25 to 25
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (ClampMin = "0", ClampMax = "100.0", UIMin = "0", UIMax = "100.0"))
-	float m_RightEndMovableRange = 50;
+	float m_EndMovableRange = 50;
 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (ClampMin = "0", ClampMax = "300.0", UIMin = "0", UIMax = "300.0"))
 	float m_MovableAreaWidth = 200;
@@ -64,6 +60,9 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	UFUNCTION(BlueprintCallable)
+	float GetEndMovableRange() const { return m_EndMovableRange; }
+
 	UFUNCTION(BlueprintCallable)
 	float GetMovableAreaWidth() const { return m_MovableAreaWidth; }
 

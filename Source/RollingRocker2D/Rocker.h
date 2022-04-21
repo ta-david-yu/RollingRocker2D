@@ -23,15 +23,20 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	USphereComponent* m_SphereCollision = nullptr;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Rocker Movement|Constrained Mode")
-	float m_OnRodGravity = 98.0f;
 	
 	UPROPERTY
 	(
-		BlueprintReadOnly, 
-		EditAnywhere, 
-		Category = "Rocker Movement|Constrained Mode",
+		BlueprintReadOnly, EditAnywhere, Category = "Rocker Movement|Constrained Mode",
+		meta = (ClampMin = "0", ClampMax = "10.0", UIMin = "0", UIMax = "10.0")
+	)
+	float m_TimeToReachConstrainedMaxSpeedWithMaxAngle = 1.5f;
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Rocker Movement|Constrained Mode")
+	float m_OnRodGravity = 196.0f;
+
+	UPROPERTY
+	(
+		BlueprintReadOnly, EditAnywhere, Category = "Rocker Movement|Constrained Mode",
 		meta = (ClampMin = "0", ClampMax = "200.0", UIMin = "0", UIMax = "200.0")
 	)
 	float m_ConstrainedMaxSpeed = 100.0f;
@@ -87,4 +92,11 @@ public:
 	  */
 	UFUNCTION(BlueprintCallable)
 	float InstantMoveClamp(float locationDelta);
+
+	UFUNCTION(BlueprintCallable)
+	float GetEvaluatedGravityFromTimeToReachMaxSpeed(float rodMovableAreaWidth, float rodEndMovableRange);
+
+#if WITH_EDITOR
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& propertyChangedEvent) override;
+#endif
 };

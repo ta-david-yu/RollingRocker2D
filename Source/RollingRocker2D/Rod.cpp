@@ -35,7 +35,7 @@ void URod::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTi
 	if (!FMath::IsNearlyEqual(m_LeftEndMoveBuffer, 0))
 	{
 		m_LeftEndHeight += m_LeftEndMoveBuffer * DeltaTime * m_EndMaxSpeed;
-		m_LeftEndHeight = FMath::Clamp(m_LeftEndHeight, -m_LeftEndMovableRange * 0.5f, m_LeftEndMovableRange * 0.5f);
+		m_LeftEndHeight = FMath::Clamp(m_LeftEndHeight, -m_EndMovableRange * 0.5f, m_EndMovableRange * 0.5f);
 		m_LeftEndMoveBuffer = 0;
 
 		leftEndMoved = true;
@@ -45,7 +45,7 @@ void URod::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTi
 	if (!FMath::IsNearlyEqual(m_RightEndMoveBuffer, 0))
 	{
 		m_RightEndHeight += m_RightEndMoveBuffer * DeltaTime * m_EndMaxSpeed;
-		m_RightEndHeight = FMath::Clamp(m_RightEndHeight, -m_RightEndMovableRange * 0.5f, m_RightEndMovableRange * 0.5f);
+		m_RightEndHeight = FMath::Clamp(m_RightEndHeight, -m_EndMovableRange * 0.5f, m_EndMovableRange * 0.5f);
 		m_RightEndMoveBuffer = 0;
 
 		rightEndMoved = true;

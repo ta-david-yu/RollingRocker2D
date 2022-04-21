@@ -20,7 +20,11 @@ void URocker::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	
+
+	float rodAreaWidth = m_Rod->GetMovableAreaWidth();
+	float rodEndMovableRange = m_Rod->GetEndMovableRange();
+	m_OnRodGravity = GetEvaluatedGravityFromTimeToReachMaxSpeed(rodAreaWidth, rodEndMovableRange);
+
 }
 
 
@@ -175,3 +179,28 @@ float URocker::InstantMoveClamp(float locationDelta)
 	
 	return locationDelta;
 }
+
+float URocker::GetEvaluatedGravityFromTimeToReachMaxSpeed(float rodMovableAreaWidth, float rodEndMovableRange)
+{
+	// Calculate the angle of the right triangle with the given two sides
+	double tan = rodEndMovableRange / rodMovableAreaWidth;
+	double maxRadianAngle = FMath::Atan(tan);
+
+	float desiredAccelerationWithMaxAngle = m_ConstrainedMaxSpeed / m_TimeToReachConstrainedMaxSpeedWithMaxAngle;
+	float gravity = desiredAccelerationWithMaxAngle / FMath::Sin(maxRadianAngle);
+
+	return gravity;
+}
+
+#if WITH_EDITOR
+void URocker::PostEditChangeProperty(FPropertyChangedEvent& propertyChangedEvent)
+{
+	Super::PostEditChangeProperty(propertyChangedEvent);
+
+	FName changedPropertyName = (propertyChangedEvent.Property != nullptr) ? propertyChangedEvent.Property->GetFName() : NAME_None;
+	if (changedPropertyName == GET_MEMBER_NAME_CHECKED(URocker, m_TimeToReachConstrainedMaxSpeedWithMaxAngle))
+	{
+		// ... find a way to update gravity
+	}
+}
+#endif
