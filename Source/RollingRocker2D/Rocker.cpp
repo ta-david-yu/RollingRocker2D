@@ -79,10 +79,6 @@ void URocker::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 	// Move location
 	locationOnRodDelta = m_CurrentVelocity * DeltaTime;
 
-	bool isSqrtMaxExtentCalculated = false;
-	float maxProjectedExtentOnRod = 0; // This value is only valid if isSqrtMaxExtentCalculated is true
-
-
 	if (FMath::Abs(locationOnRodDelta) > 0)
 	{
 		// Move
@@ -161,7 +157,7 @@ void URocker::SnapWorldLocationToRod()
 	FVector rodCenterToWorldLocation = normalizedRodVector * m_LocationOnRod;
 	FVector rodCenter = m_Rod->GetRodCenterLocation();
 	FVector rockerWorldLocation = rodCenter + rodCenterToWorldLocation + FVector::UpVector * GetCollisionRadius();
-	SetWorldLocation(rockerWorldLocation);
+	SetWorldLocation(rockerWorldLocation, true);
 }
 
 float URocker::GetEvaluatedGravityFromTimeToReachMaxSpeed(float rodMovableAreaWidth, float rodEndMovableRange)
