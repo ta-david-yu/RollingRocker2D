@@ -24,9 +24,15 @@ struct FRodLocationChangedEventData
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector NewRightLocation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float LeftExceededHeightAmount;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float RightExceededHeightAmount;
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRodLocationChangedEvent, FRodLocationChangedEventData&, rodLocationChangedData);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRodLocationChangedEvent, FRodLocationChangedEventData, rodLocationChangedData);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRodEndLocationChangedEvent, FVector, NewLocation);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -72,10 +78,6 @@ private:
 public:
 	// Sets default values for this component's properties
 	URod();
-
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
 
 public:
 	UFUNCTION(BlueprintCallable)

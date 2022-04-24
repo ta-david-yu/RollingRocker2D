@@ -13,17 +13,6 @@ URod::URod()
 	// ...
 }
 
-
-// Called when the game starts
-void URod::BeginPlay()
-{
-	Super::BeginPlay();
-
-	// ...
-	
-}
-
-
 // Called every frame
 void URod::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -32,23 +21,35 @@ void URod::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTi
 	bool leftEndMoved = false;
 	bool rightEndMoved = false;
 
+	float leftExceededHeightAmount = 0;
+	float rightExceededHeightAmount = 0;
+
 	FVector oldLeftLocation = GetLeftEndLocation();
 	FVector oldRightLocation = GetRightEndLocation();
 
 	if (!FMath::IsNearlyEqual(m_LeftEndMoveBuffer, 0))
 	{
-		m_LeftEndHeight += m_LeftEndMoveBuffer * DeltaTime * m_EndMaxSpeed;
-		m_LeftEndHeight = FMath::Clamp(m_LeftEndHeight, -m_EndMovableRange * 0.5f, m_EndMovableRange * 0.5f);
+		float newHeight = m_LeftEndHeight + m_LeftEndMoveBuffer * DeltaTime * m_EndMaxSpeed;
+		float clampedNewHeight = FMath::Clamp(newHeight, -m_EndMovableRange * 0.5f, m_EndMovableRange * 0.5f);
+
+		leftExceededHeightAmount = FMath::Sign(newHeight) * FMath::Max(FMath::Abs(newHeight) - FMath::Abs(clampedNewHeight), 0);
+
+		m_LeftEndHeight = clampedNewHeight;
 		m_LeftEndMoveBuffer = 0;
 
 		leftEndMoved = true;
+
 		OnLeftEndLocationChanged.Broadcast(GetLeftEndLocation());
 	}
 
 	if (!FMath::IsNearlyEqual(m_RightEndMoveBuffer, 0))
 	{
-		m_RightEndHeight += m_RightEndMoveBuffer * DeltaTime * m_EndMaxSpeed;
-		m_RightEndHeight = FMath::Clamp(m_RightEndHeight, -m_EndMovableRange * 0.5f, m_EndMovableRange * 0.5f);
+		float newHeight = m_RightEndHeight + m_RightEndMoveBuffer * DeltaTime * m_EndMaxSpeed;
+		float clampedNewHeight = FMath::Clamp(newHeight, -m_EndMovableRange * 0.5f, m_EndMovableRange * 0.5f);
+
+		rightExceededHeightAmount = FMath::Sign(newHeight) * FMath::Max(FMath::Abs(newHeight) - FMath::Abs(clampedNewHeight), 0);
+
+		m_RightEndHeight = clampedNewHeight;
 		m_RightEndMoveBuffer = 0;
 
 		rightEndMoved = true;
@@ -62,6 +63,8 @@ void URod::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTi
 		data.OldRightLocation = oldRightLocation;
 		data.NewLeftLocation = GetLeftEndLocation();
 		data.NewRightLocation = GetRightEndLocation();
+		data.LeftExceededHeightAmount = FMath::Abs(leftExceededHeightAmount) > 0 ? leftExceededHeightAmount : 0;
+		data.RightExceededHeightAmount = FMath::Abs(rightExceededHeightAmount) > 0 ? rightExceededHeightAmount : 0;
 
 		OnRodLocationChanged.Broadcast(data);
 	}

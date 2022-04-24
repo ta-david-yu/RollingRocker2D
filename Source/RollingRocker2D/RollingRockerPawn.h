@@ -6,10 +6,22 @@
 #include "GameFramework/Pawn.h"
 #include "Rod.h"
 #include "Rocker.h"
+#include "CanFall.h"
 #include "RollingRockerPawn.generated.h"
 
+USTRUCT(BlueprintType)
+struct FMoveForwardEventData
+{
+	GENERATED_BODY()
+		
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float MoveAmount;
+};
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveForwardEvent, FMoveForwardEventData, moveForwardEventData);
+
 UCLASS()
-class ROLLINGROCKER2D_API ARollingRockerPawn : public APawn
+class ROLLINGROCKER2D_API ARollingRockerPawn : public APawn, public ICanFall
 {
 	GENERATED_BODY()
 
@@ -23,6 +35,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	USceneComponent* RodAppearance = nullptr;
 
+	UPROPERTY(BlueprintAssignable)
+	FMoveForwardEvent OnMoveForward;
+
 protected:
 	// Sets default values for this pawn's properties
 	ARollingRockerPawn();
@@ -31,14 +46,16 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
+public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+public:
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void FallDownTo();									
+	virtual void FallDownTo_Implementation() override; 
+
 private:
-	
 	UFUNCTION()
-	void HandleOnRodLocationChanged(FRodLocationChangedEventData& eventData);
+	void HandleOnRodLocationChanged(FRodLocationChangedEventData eventData);
 };
