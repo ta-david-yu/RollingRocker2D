@@ -41,6 +41,7 @@ void ARollingRockerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 void ARollingRockerPawn::FallDownTo_Implementation()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Fall Down ~");
+	SetActorEnableCollision(false);
 }
 
 void ARollingRockerPawn::handleOnRodLocationChanged(FRodLocationChangedEventData eventData)

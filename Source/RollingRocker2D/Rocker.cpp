@@ -101,13 +101,13 @@ float URocker::calculateConstrainedModeAccelerationOnSlope(FVector groundDirecti
 	{
 		auto gravityDirection = FVector::DownVector;
 		auto projectedAccelerationVector = gravityDirection.ProjectOnTo(slopeDirection);
-
 		float accelerationDirection = FMath::Sign(projectedAccelerationVector.X);
 		float acceleration = accelerationDirection * projectedAccelerationVector.Length() * m_OnRodGravity;
 		return acceleration;
 	}
 	else
 	{
+		// Decelerate in the opposite direction
 		if (FMath::IsNearlyZero(m_CurrentVelocity))
 		{
 			return 0;
