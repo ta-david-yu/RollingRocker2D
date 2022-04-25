@@ -45,13 +45,6 @@ void ARollingRockerPawn::FallDownTo_Implementation()
 
 void ARollingRockerPawn::handleOnRodLocationChanged(FRodLocationChangedEventData eventData)
 {
-	// Update rod appearance (location & rotation)
-	FVector centerLocation = (eventData.NewLeftLocation + eventData.NewRightLocation) * 0.5f;
-	FVector safeAxis = FVector::LeftVector.GetSafeNormal();		// Make sure axis is unit length
-	FRotator rotation = FQuat(safeAxis, Rod->GetSignedAngle()).Rotator();
-
-	RodAppearance->SetWorldLocationAndRotationNoPhysics(centerLocation, rotation);
-
 	// Do move forward logic
 	float leftExceededAmount = eventData.LeftExceededHeightAmount;
 	float rightExceededAmount = eventData.RightExceededHeightAmount;
