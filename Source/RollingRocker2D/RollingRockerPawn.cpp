@@ -45,38 +45,12 @@ void ARollingRockerPawn::FallDownTo_Implementation()
 
 void ARollingRockerPawn::handleOnRodLocationChanged(FRodLocationChangedEventData eventData)
 {
-	// Rod appearance location
+	// Update rod appearance (location & rotation)
 	FVector centerLocation = (eventData.NewLeftLocation + eventData.NewRightLocation) * 0.5f;
-
-	// Rod appearance rotation
-	FVector safeAxis = FVector::LeftVector.GetSafeNormal(); // Make sure axis is unit length
+	FVector safeAxis = FVector::LeftVector.GetSafeNormal();		// Make sure axis is unit length
 	FRotator rotation = FQuat(safeAxis, Rod->GetSignedAngle()).Rotator();
 
 	RodAppearance->SetWorldLocationAndRotationNoPhysics(centerLocation, rotation);
-
-	// Do Rocker location capping in case Rod length shrinks during its movement
-	float rockerLocationOnRod = Rocker->GetLocationOnRod();
-	float rockerLocationSign = FMath::Sign(rockerLocationOnRod);
-	float rockerEdgeLocationOnRod = Rocker->GetLocationOnRod() + rockerLocationSign * Rocker->GetCollisionRadius();
-	float sqrRockerEdgeLocationOnRod = rockerEdgeLocationOnRod * rockerEdgeLocationOnRod;
-
-	float sqrRodLength = Rod->GetRodVector().SquaredLength();
-	float sqrRodHalfLength = sqrRodLength / 4;
-
-	if (sqrRockerEdgeLocationOnRod > sqrRodHalfLength)
-	{
-		// Rocker location is outside the rod length, do adjustment move
-		float rodHalfLength = FMath::Sqrt(sqrRodLength) * 0.5f;
-		float exceededAmount = FMath::Abs(rockerEdgeLocationOnRod) - rodHalfLength;
-		float adjustmentDelta = -exceededAmount * rockerLocationSign;
-
-		float actualAppliedDelta = Rocker->InstantMoveClamp(adjustmentDelta);
-		Rocker->RotateWithLocationDelta(actualAppliedDelta);
-	}
-	else
-	{
-		Rocker->SnapWorldLocationToRod();
-	}
 
 	// Do move forward logic
 	float leftExceededAmount = eventData.LeftExceededHeightAmount;

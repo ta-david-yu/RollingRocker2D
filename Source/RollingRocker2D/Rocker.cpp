@@ -117,20 +117,21 @@ float URocker::calculateConstrainedModeAccelerationOnSlope(FVector groundDirecti
 			return -FMath::Sign(m_CurrentVelocity) * m_OnRodDeceleration;
 		}
 	}
+}
 
-	/*
-	auto gravityDirection = FVector::DownVector;
-	auto projectedAccelerationVector = gravityDirection.ProjectOnTo(slopeDirection);
-	float accelerationDirection = FMath::Sign(projectedAccelerationVector.X);
-	if (accelerationDirection == 0)
+void URocker::SetRod(URod* rod)
+{
+	if (m_Rod->IsValidLowLevel())
 	{
-		// The rod is flat
-		return 0;
+		m_Rod->OnRodLocationChanged.RemoveDynamic(this, &URocker::handleOnRodLocationChanged);
 	}
 
-	float acceleration = accelerationDirection * projectedAccelerationVector.Length() * m_OnRodGravity;
-	return acceleration;
-	*/
+	m_Rod = rod;
+
+	if (m_Rod->IsValidLowLevel())
+	{
+		m_Rod->OnRodLocationChanged.AddDynamic(this, &URocker::handleOnRodLocationChanged);
+	}
 }
 
 void URocker::ActivateFreeMoveMode() 
@@ -211,6 +212,33 @@ float URocker::GetEvaluatedGravityFromTimeToReachMaxSpeed(float rodMovableAreaWi
 	float gravity = desiredAccelerationWithMaxAngle / FMath::Sin(maxRadianAngle);
 
 	return gravity;
+}
+
+void URocker::handleOnRodLocationChanged(FRodLocationChangedEventData eventData)
+{
+	// Do Rocker location capping in case Rod length shrinks during its movement
+	float rockerLocationOnRod = GetLocationOnRod();
+	float rockerLocationSign = FMath::Sign(rockerLocationOnRod);
+	float rockerEdgeLocationOnRod = rockerLocationOnRod + rockerLocationSign * GetCollisionRadius();
+	float sqrRockerEdgeLocationOnRod = rockerEdgeLocationOnRod * rockerEdgeLocationOnRod;
+
+	float sqrRodLength = m_Rod->GetRodVector().SquaredLength();
+	float sqrRodHalfLength = sqrRodLength / 4;
+
+	if (sqrRockerEdgeLocationOnRod > sqrRodHalfLength)
+	{
+		// Rocker location is outside the rod length, do adjustment move
+		float rodHalfLength = FMath::Sqrt(sqrRodLength) * 0.5f;
+		float exceededAmount = FMath::Abs(rockerEdgeLocationOnRod) - rodHalfLength;
+		float adjustmentDelta = -exceededAmount * rockerLocationSign;
+
+		float actualAppliedDelta = InstantMoveClamp(adjustmentDelta);
+		RotateWithLocationDelta(actualAppliedDelta);
+	}
+	else
+	{
+		SnapWorldLocationToRod();
+	}
 }
 
 #if WITH_EDITOR

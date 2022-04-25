@@ -91,6 +91,9 @@ private:
 
 public:
 	UFUNCTION(BlueprintCallable)
+	void SetRod(URod* rod);
+
+	UFUNCTION(BlueprintCallable)
 	float GetCollisionRadius() const { return m_SphereCollision->GetScaledSphereRadius(); }
 
 	UFUNCTION(BlueprintCallable)
@@ -131,6 +134,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetEvaluatedGravityFromTimeToReachMaxSpeed(float rodMovableAreaWidth, float rodEndMovableRange);
 
+
+private:
+	UFUNCTION()
+	void handleOnRodLocationChanged(FRodLocationChangedEventData eventData);
+
+public:
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& propertyChangedEvent) override;
 #endif
