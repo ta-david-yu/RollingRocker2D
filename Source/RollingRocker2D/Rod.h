@@ -108,6 +108,12 @@ public:
 	FVector GetRodVector() const { return GetRightEndLocation() - GetLeftEndLocation(); }
 
 	UFUNCTION(BlueprintCallable)
+	double GetAngle() const;
+
+	UFUNCTION(BlueprintCallable)
+	double GetSignedAngle() const;
+
+	UFUNCTION(BlueprintCallable)
 	void MoveLeftEnd(float scalar);
 	
 	UFUNCTION(BlueprintCallable)

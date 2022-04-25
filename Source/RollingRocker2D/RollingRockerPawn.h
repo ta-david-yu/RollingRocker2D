@@ -57,5 +57,5 @@ public:
 
 private:
 	UFUNCTION()
-	void HandleOnRodLocationChanged(FRodLocationChangedEventData eventData);
+	void handleOnRodLocationChanged(FRodLocationChangedEventData eventData);
 };

@@ -28,7 +28,7 @@ void ARollingRockerPawn::BeginPlay()
 	}
 
 	// Register Events
-	Rod->OnRodLocationChanged.AddDynamic(this, &ARollingRockerPawn::HandleOnRodLocationChanged);
+	Rod->OnRodLocationChanged.AddDynamic(this, &ARollingRockerPawn::handleOnRodLocationChanged);
 }
 
 // Called to bind functionality to input
@@ -43,24 +43,14 @@ void ARollingRockerPawn::FallDownTo_Implementation()
 	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Fall Down ~");
 }
 
-void ARollingRockerPawn::HandleOnRodLocationChanged(FRodLocationChangedEventData eventData)
+void ARollingRockerPawn::handleOnRodLocationChanged(FRodLocationChangedEventData eventData)
 {
 	// Rod appearance location
 	FVector centerLocation = (eventData.NewLeftLocation + eventData.NewRightLocation) * 0.5f;
 
 	// Rod appearance rotation
-	FVector normalizedRodVector = (eventData.NewRightLocation - eventData.NewLeftLocation).GetUnsafeNormal();
-	FVector rodForward = Rod->GetForwardVector().GetUnsafeNormal();
-
-	double dot = FVector::DotProduct(rodForward, normalizedRodVector);
-	double radianAngle = FMath::Acos(dot);
-
-	FVector cross = FVector::CrossProduct(rodForward, normalizedRodVector);
-	FVector screenPlaneNormal = FVector::LeftVector;
-	float angleSign = FVector::DotProduct(cross, screenPlaneNormal) > 0 ? 1 : -1;
-
-	FVector SafeAxis = FVector::LeftVector.GetSafeNormal(); // Make sure axis is unit length
-	FRotator rotation = FQuat(SafeAxis, angleSign * radianAngle).Rotator();
+	FVector safeAxis = FVector::LeftVector.GetSafeNormal(); // Make sure axis is unit length
+	FRotator rotation = FQuat(safeAxis, Rod->GetSignedAngle()).Rotator();
 
 	RodAppearance->SetWorldLocationAndRotationNoPhysics(centerLocation, rotation);
 

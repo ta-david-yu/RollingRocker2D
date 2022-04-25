@@ -30,9 +30,6 @@ protected:
 		meta = (ClampMin = "0", ClampMax = "10.0", UIMin = "0", UIMax = "10.0")
 	)
 	float m_TimeToReachConstrainedMaxSpeedWithMaxAngle = 1.5f;
-	
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Rocker Movement|Constrained Mode")
-	float m_OnRodGravity = 196.0f;
 
 	UPROPERTY
 	(
@@ -40,6 +37,26 @@ protected:
 		meta = (ClampMin = "0", ClampMax = "200.0", UIMin = "0", UIMax = "200.0")
 	)
 	float m_ConstrainedMaxSpeed = 100.0f;
+	
+	UPROPERTY
+	(
+		BlueprintReadOnly, EditAnywhere, Category = "Rocker Movement|Constrained Mode",
+		meta = (ClampMin = "0", ClampMax = "45.0", UIMin = "0", UIMax = "45.0")
+	)
+	float m_MinimumAccelerationAngle = 5.0f;
+
+	UPROPERTY
+	(
+		BlueprintReadOnly, EditAnywhere, Category = "Rocker Movement|Constrained Mode",
+		meta = (ClampMin = "0.1", ClampMax = "10.0", UIMin = "0.1", UIMax = "10.0")
+	)
+	float m_TimeToCompletelyStopInConstrainedMode = 1.5f;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Rocker Movement|Constrained Mode")
+	float m_OnRodGravity = 196.0f;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Rocker Movement|Constrained Mode")
+	float m_OnRodDeceleration = 0;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Rocker Movement|FreeMove Mode")
 	float m_FreeMoveSpeed = 100.0f;
@@ -65,7 +82,14 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:	
+public:
+	// Called every frame
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+private:
+	float calculateConstrainedModeAccelerationOnSlope(FVector groundDirection, FVector slopeDirection) const;
+
+public:
 	UFUNCTION(BlueprintCallable)
 	float GetCollisionRadius() const { return m_SphereCollision->GetScaledSphereRadius(); }
 
@@ -81,9 +105,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void DeactivateFreeMoveMode();
 
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	
 	/**
 	  * Input move the rocker in free move mode manner
 	  * @param	moveDirection: 1 means right, -1 means left

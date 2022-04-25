@@ -19,12 +19,13 @@ void URocker::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-
+	// Evaluate gravity from the settings
 	float rodAreaWidth = m_Rod->GetMovableAreaWidth();
 	float rodEndMovableRange = m_Rod->GetEndMovableRange();
 	m_OnRodGravity = GetEvaluatedGravityFromTimeToReachMaxSpeed(rodAreaWidth, rodEndMovableRange);
 
+	// Evaluate deceleration from the settings
+	m_OnRodDeceleration = m_ConstrainedMaxSpeed / m_TimeToCompletelyStopInConstrainedMode;
 }
 
 
@@ -43,7 +44,7 @@ void URocker::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 	FVector worldLocation = GetComponentLocation();
 	float locationOnRodDelta = 0;
 
-	// Do playing input handling
+	// Do input handling
 	if (m_IsFreeMoveMode)
 	{
 		m_CurrentVelocity = m_FreeMoveDirectionBuffer * m_FreeMoveSpeed;
@@ -55,24 +56,22 @@ void URocker::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 	else
 	{
 		// Do acceleration calculation
-		auto gravityDirection = FVector::DownVector;
-		auto projectedAccelerationVector = gravityDirection.ProjectOnTo(normalizedRodDirectionVector);
-		float accelerationDirection = FMath::Sign(projectedAccelerationVector.X);
-
-		if (accelerationDirection != 0)
+		float acceleration = calculateConstrainedModeAccelerationOnSlope(m_Rod->GetForwardVector(), normalizedRodDirectionVector);
+		if (!FMath::IsNearlyZero(acceleration))
 		{
-			// Apply acceleration if the rod is not flat
-			float acceleration = accelerationDirection * projectedAccelerationVector.Length() * m_OnRodGravity * DeltaTime;
-			float newVelocity = m_CurrentVelocity + acceleration;
+			float accelerationThisFrame = acceleration * DeltaTime;
+			float newVelocity = m_CurrentVelocity + accelerationThisFrame;
+
+			// Acceleration capping
 			float newSpeed = FMath::Abs(newVelocity);
 			if (newSpeed > m_ConstrainedMaxSpeed)
 			{
 				// New velocity value exceeds the max speed, clamp it
 				float accelerationAdjustment = newSpeed - m_ConstrainedMaxSpeed;
-				acceleration -= accelerationAdjustment * FMath::Sign(newVelocity);
+				accelerationThisFrame -= accelerationAdjustment * FMath::Sign(newVelocity);
 			}
 
-			m_CurrentVelocity += acceleration;
+			m_CurrentVelocity += accelerationThisFrame;
 		}
 	}
 
@@ -90,6 +89,48 @@ void URocker::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 			m_CurrentVelocity = 0;
 		}
 	}
+}
+
+float URocker::calculateConstrainedModeAccelerationOnSlope(FVector groundDirection, FVector slopeDirection) const
+{
+	FVector rodForward = groundDirection.GetUnsafeNormal();
+	double dot = FVector::DotProduct(rodForward, slopeDirection);
+	double radianAngle = FMath::Acos(dot);
+	double degreeAngle = FMath::RadiansToDegrees(radianAngle);
+	if (degreeAngle > m_MinimumAccelerationAngle)
+	{
+		auto gravityDirection = FVector::DownVector;
+		auto projectedAccelerationVector = gravityDirection.ProjectOnTo(slopeDirection);
+
+		float accelerationDirection = FMath::Sign(projectedAccelerationVector.X);
+		float acceleration = accelerationDirection * projectedAccelerationVector.Length() * m_OnRodGravity;
+		return acceleration;
+	}
+	else
+	{
+		if (FMath::IsNearlyZero(m_CurrentVelocity))
+		{
+			return 0;
+		}
+		else
+		{
+			return -FMath::Sign(m_CurrentVelocity) * m_OnRodDeceleration;
+		}
+	}
+
+	/*
+	auto gravityDirection = FVector::DownVector;
+	auto projectedAccelerationVector = gravityDirection.ProjectOnTo(slopeDirection);
+	float accelerationDirection = FMath::Sign(projectedAccelerationVector.X);
+	if (accelerationDirection == 0)
+	{
+		// The rod is flat
+		return 0;
+	}
+
+	float acceleration = accelerationDirection * projectedAccelerationVector.Length() * m_OnRodGravity;
+	return acceleration;
+	*/
 }
 
 void URocker::ActivateFreeMoveMode() 

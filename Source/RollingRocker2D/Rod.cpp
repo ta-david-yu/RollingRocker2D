@@ -70,6 +70,29 @@ void URod::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTi
 	}
 }
 
+double URod::GetAngle() const
+{
+	FVector rodForward = GetForwardVector().GetUnsafeNormal();
+	FVector normalizedRodVector = GetRodVector().GetUnsafeNormal();
+	double dot = FVector::DotProduct(rodForward, normalizedRodVector);
+	double radianAngle = FMath::Acos(dot);
+	return radianAngle;
+}
+
+double URod::GetSignedAngle() const
+{
+	FVector rodForward = GetForwardVector().GetUnsafeNormal();
+	FVector normalizedRodVector = GetRodVector().GetUnsafeNormal();
+
+	FVector cross = FVector::CrossProduct(rodForward, normalizedRodVector);
+	FVector screenPlaneNormal = FVector::LeftVector;
+	float angleSign = FVector::DotProduct(cross, screenPlaneNormal) > 0 ? 1 : -1;
+
+	double dot = FVector::DotProduct(rodForward, normalizedRodVector);
+	double radianAngle = FMath::Acos(dot);
+	return angleSign * radianAngle;
+}
+
 void URod::MoveLeftEnd(float scalar)
 {
 	m_LeftEndMoveBuffer = FMath::Clamp(scalar, -1, 1);
