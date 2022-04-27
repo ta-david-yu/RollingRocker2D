@@ -37,8 +37,15 @@ void UFallAnimationController::TickComponent(float DeltaTime, ELevelTick TickTyp
 	if (m_ScaleTimer <= ScaleToZeroTime)
 	{
 		m_ScaleTimer += DeltaTime;
+
+		// Location
 		m_Velocity += FVector::DownVector * DeltaTime * m_Gravity;
 		m_TargetSceneComponent->SetWorldLocation(m_TargetSceneComponent->GetComponentLocation() + m_Velocity * DeltaTime);
+
+		// Rotation
+		m_TargetSceneComponent->AddLocalRotation(m_RotationDeltaPerFrame);
+
+		// Scale
 		float scaledTime = FMath::Clamp(m_ScaleTimer / ScaleToZeroTime, 0, 1);
 		float scale = ScalingCurve->GetFloatValue(scaledTime);
 		m_TargetSceneComponent->SetWorldScale3D(FVector::One() * scale);
@@ -51,11 +58,12 @@ void UFallAnimationController::TickComponent(float DeltaTime, ELevelTick TickTyp
 }
 
 
-void UFallAnimationController::PlayFallAnimationOnSceneComponent(USceneComponent* sceneComponent, FVector initialVelocity, float gravity)
+void UFallAnimationController::PlayFallAnimationOnSceneComponent(USceneComponent* sceneComponent, FVector initialVelocity, FRotator rotationDeltaPerFrame, float gravity)
 {
 	m_IsAnimating = true;
 	m_TargetSceneComponent = sceneComponent;
 	m_Velocity = initialVelocity;
+	m_RotationDeltaPerFrame = rotationDeltaPerFrame;
 	m_Gravity = gravity;
 
 	m_ScaleTimer = 0;

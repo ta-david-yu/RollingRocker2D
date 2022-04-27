@@ -35,6 +35,9 @@ protected:
 	FVector m_Velocity = FVector(0, 0, 0);
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	FRotator m_RotationDeltaPerFrame = FRotator::ZeroRotator;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	float m_Gravity = 0.0f;
 
 public:	
@@ -50,7 +53,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable)
-	void PlayFallAnimationOnSceneComponent(USceneComponent* sceneComponent, FVector initialVelocity, float gravity);
+	void PlayFallAnimationOnSceneComponent(USceneComponent* sceneComponent, FVector initialVelocity, FRotator initialAngularVelocity, float gravity);
 
 	UFUNCTION(BlueprintCallable)
 	void StopFallAnimation();

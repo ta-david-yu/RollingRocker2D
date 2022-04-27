@@ -139,6 +139,23 @@ void URocker::SetRod(URod* rod)
 	}
 }
 
+FVector URocker::GetWorldLocationFromPointOnRod(float pointOnRod) const
+{
+	FVector normalizedRodVector = m_Rod->GetRodVector().GetSafeNormal();
+	FVector rodCenterToWorldLocation = normalizedRodVector * pointOnRod;
+	FVector rodCenter = m_Rod->GetRodCenterLocation();
+	FVector pointWorldLocation = rodCenter + rodCenterToWorldLocation;
+	return pointWorldLocation;
+}
+
+FRotator URocker::GetAngularVelocity(float locationDelta) const
+{
+	double radianAngle = -locationDelta / (GetCollisionRadius());
+	FVector safeAxis = FVector::LeftVector.GetSafeNormal(); // Make sure axis is unit length
+	FRotator rotation = FQuat(safeAxis, radianAngle).Rotator();
+	return rotation;
+}
+
 void URocker::SetMovementState(ERockerMovementState state)
 {
 	ERockerMovementState prevState = m_MovementState;
@@ -157,10 +174,8 @@ void URocker::FreeMove(float moveDirection)
 void URocker::RotateWithLocationDelta(float locationDelta)
 {
 	// Update rotation based on locationDelta
-	double radianAngle = -locationDelta / (GetCollisionRadius());
-	FVector SafeAxis = FVector::LeftVector.GetSafeNormal(); // Make sure axis is unit length
-	FRotator rotation = FQuat(SafeAxis, radianAngle).Rotator();
-	AddLocalRotation(rotation);
+	m_LastRotationDelta = GetAngularVelocity(locationDelta);
+	AddLocalRotation(m_LastRotationDelta);
 }
 
 float URocker::InstantMoveClamp(float locationDelta)

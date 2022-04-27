@@ -76,6 +76,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	float m_CurrentVelocity = 0;
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	FRotator m_LastRotationDelta;
 
 private:
 	UPROPERTY(VisibleAnywhere)
@@ -101,13 +104,19 @@ public:
 	void SetRod(URod* rod);
 
 	UFUNCTION(BlueprintCallable)
-	float GetCollisionRadius() const { return m_SphereCollision->GetScaledSphereRadius(); }
+	float GetCollisionRadius() const { return m_SphereCollision->GetUnscaledSphereRadius(); }
 
 	UFUNCTION(BlueprintCallable)
 	float GetLocationOnRod() const { return m_LocationOnRod; }
 
 	UFUNCTION(BlueprintCallable)
+	FVector GetWorldLocationFromPointOnRod(float pointOnRod) const;
+
+	UFUNCTION(BlueprintCallable)
 	FVector GetVelocity3D() const { return m_CurrentVelocity * m_Rod->GetRodVector().GetUnsafeNormal(); }
+
+	UFUNCTION(BlueprintCallable)
+	FRotator GetAngularVelocity(float locationDelta) const;
 
 	UFUNCTION(BlueprintCallable)
 	void SetMovementState(ERockerMovementState state);
