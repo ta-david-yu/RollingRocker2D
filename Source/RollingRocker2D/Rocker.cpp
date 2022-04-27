@@ -34,6 +34,11 @@ void URocker::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	if (m_MovementState == ERockerMovementState::External)
+	{
+		return;
+	}
+
 	if (!m_Rod->IsValidLowLevelFast())
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("Rocker's m_Rod is not valid."));
@@ -45,7 +50,7 @@ void URocker::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 	float locationOnRodDelta = 0;
 
 	// Do input handling
-	if (m_IsFreeMoveMode)
+	if (m_MovementState == ERockerMovementState::Free)
 	{
 		m_CurrentVelocity = m_FreeMoveDirectionBuffer * m_FreeMoveSpeed;
 		if (!FMath::IsNearlyEqual(m_FreeMoveDirectionBuffer, 0))
@@ -53,7 +58,7 @@ void URocker::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 			m_FreeMoveDirectionBuffer = 0;
 		}
 	}
-	else
+	else if (m_MovementState == ERockerMovementState::Constrained)
 	{
 		// Do acceleration calculation
 		float acceleration = calculateConstrainedModeAccelerationOnSlope(m_Rod->GetForwardVector(), normalizedRodDirectionVector);
@@ -134,16 +139,14 @@ void URocker::SetRod(URod* rod)
 	}
 }
 
-void URocker::ActivateFreeMoveMode() 
-{ 
-	m_IsFreeMoveMode = true;
-	m_CurrentVelocity = 0;
-}
-
-void URocker::DeactivateFreeMoveMode() 
-{ 
-	m_IsFreeMoveMode = false;
-	m_CurrentVelocity = 0;
+void URocker::SetMovementState(ERockerMovementState state)
+{
+	ERockerMovementState prevState = m_MovementState;
+	m_MovementState = state;
+	if (m_MovementState == ERockerMovementState::Free)
+	{
+		m_CurrentVelocity = 0;
+	}
 }
 
 void URocker::FreeMove(float moveDirection)
@@ -216,6 +219,11 @@ float URocker::GetEvaluatedGravityFromTimeToReachMaxSpeed(float rodMovableAreaWi
 
 void URocker::handleOnRodLocationChanged(FRodLocationChangedEventData eventData)
 {
+	if (m_MovementState == ERockerMovementState::External)
+	{
+		return;
+	}
+
 	// Do Rocker location capping in case Rod length shrinks during its movement
 	float rockerLocationOnRod = GetLocationOnRod();
 	float rockerLocationSign = FMath::Sign(rockerLocationOnRod);

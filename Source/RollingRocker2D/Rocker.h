@@ -11,6 +11,13 @@
 #include "PaperSpriteComponent.h"
 #include "Rocker.generated.h"
 
+UENUM(BlueprintType)
+enum class ERockerMovementState : uint8
+{
+	Constrained UMETA(ToolTip="Move by on rod gravity acceleration"),
+	Free UMETA(ToolTip="Move left or right freely without influences of gravity"),
+	External UMETA(ToolTip="No movement is applied, can be used to play external force or simply freeze Rocker in location")
+};
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ROLLINGROCKER2D_API URocker : public USceneComponent
@@ -65,7 +72,7 @@ protected:
 	float m_LocationOnRod = 0;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	bool m_IsFreeMoveMode = false;
+	ERockerMovementState m_MovementState = ERockerMovementState::Constrained;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	float m_CurrentVelocity = 0;
@@ -100,13 +107,13 @@ public:
 	float GetLocationOnRod() const { return m_LocationOnRod; }
 
 	UFUNCTION(BlueprintCallable)
-	bool IsFreeMoveMode() const { return m_IsFreeMoveMode; }
+	FVector GetVelocity3D() const { return m_CurrentVelocity * m_Rod->GetRodVector().GetUnsafeNormal(); }
 
 	UFUNCTION(BlueprintCallable)
-	void ActivateFreeMoveMode();
+	void SetMovementState(ERockerMovementState state);
 
 	UFUNCTION(BlueprintCallable)
-	void DeactivateFreeMoveMode();
+	bool IsMovementState(ERockerMovementState state) const { return m_MovementState == state; }
 
 	/**
 	  * Input move the rocker in free move mode manner

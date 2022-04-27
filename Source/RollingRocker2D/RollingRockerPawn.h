@@ -18,7 +18,14 @@ struct FMoveForwardEventData
 	float MoveAmount;
 };
 
+USTRUCT(BlueprintType)
+struct FFallDownEventData
+{
+	GENERATED_BODY()
+};
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveForwardEvent, FMoveForwardEventData, moveForwardEventData);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FFallDownEvent, FFallDownEventData, fallDownEventData);
 
 UCLASS()
 class ROLLINGROCKER2D_API ARollingRockerPawn : public APawn, public ICanFall
@@ -37,6 +44,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FMoveForwardEvent OnMoveForward;
+	
+	UPROPERTY(BlueprintAssignable)
+	FFallDownEvent OnFallDown;
 
 protected:
 	// Sets default values for this pawn's properties
