@@ -34,6 +34,12 @@ void UFallAnimationController::TickComponent(float DeltaTime, ELevelTick TickTyp
 		return;
 	}
 
+	if (!ScalingCurve->IsValidLowLevelFast())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("FallAnimationController's ScalingCurve is not valid."));
+		return;
+	}
+
 	if (m_ScaleTimer <= ScaleToZeroTime)
 	{
 		m_ScaleTimer += DeltaTime;

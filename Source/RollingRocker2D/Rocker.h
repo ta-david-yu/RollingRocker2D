@@ -117,6 +117,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	FRotator GetAngularVelocity(float locationDelta) const;
+	
+	UFUNCTION(BlueprintCallable)
+	FRotator GetLastRotationDelta() const { return m_LastRotationDelta; }
 
 	UFUNCTION(BlueprintCallable)
 	void SetMovementState(ERockerMovementState state);

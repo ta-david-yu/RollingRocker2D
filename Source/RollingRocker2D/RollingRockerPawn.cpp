@@ -8,6 +8,8 @@ ARollingRockerPawn::ARollingRockerPawn()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
+
+	m_FallAnimationController = CreateDefaultSubobject<UFallAnimationController>("FallAnimationController");
 }
 
 // Called when the game starts or when spawned
@@ -41,7 +43,30 @@ void ARollingRockerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 void ARollingRockerPawn::FallDownTo_Implementation()
 {
 	SetActorEnableCollision(false);
+	Rocker->SetMovementState(ERockerMovementState::External);
+	m_FallAnimationController->PlayFallAnimationOnSceneComponent(Rocker, Rocker->GetVelocity3D(), Rocker->GetLastRotationDelta(), 50.0f);
+	
+	// Setup a delayed kill that will happen when the fall animation is done
+	m_FallAnimationController->OnAnimationEnd.AddDynamic(this, &ARollingRockerPawn::handleOnFallAnimationEnd);
+
 	OnFallDown.Broadcast(FFallDownEventData{});
+}
+
+FKillResult ARollingRockerPawn::Kill_Implementation()
+{
+	m_IsDead = true;
+	OnDied.Broadcast(FDeathEventData { });
+	
+	FKillResult result { };
+	result.Success = true;
+
+	return result;
+}
+
+void ARollingRockerPawn::handleOnFallAnimationEnd(USceneComponent* targetSceneComponent)
+{
+	Kill();
+	m_FallAnimationController->OnAnimationEnd.RemoveDynamic(this, &ARollingRockerPawn::handleOnFallAnimationEnd);
 }
 
 void ARollingRockerPawn::handleOnRodLocationChanged(FRodLocationChangedEventData eventData)

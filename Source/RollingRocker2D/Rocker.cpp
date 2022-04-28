@@ -94,6 +94,10 @@ void URocker::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 			m_CurrentVelocity = 0;
 		}
 	}
+	else
+	{
+		m_LastRotationDelta = FRotator::ZeroRotator;
+	}
 }
 
 float URocker::calculateConstrainedModeAccelerationOnSlope(FVector groundDirection, FVector slopeDirection) const
