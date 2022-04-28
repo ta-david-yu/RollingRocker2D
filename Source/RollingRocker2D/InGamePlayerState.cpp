@@ -9,7 +9,7 @@ void AInGamePlayerState::BeginPlay()
 	Super::BeginPlay();
 
 	// Initialize player state
-	m_CurrentLivesCount = m_MaxLivesCount;
+	m_CurrentLivesCount = m_InitialLivesCount;
 
 	// Register player pawn events
 	m_RollingRockerPawn = Cast<ARollingRockerPawn>(GetPlayerController()->GetPawn());

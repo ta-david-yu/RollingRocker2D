@@ -81,8 +81,8 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void FallDownTo();									
-	virtual void FallDownTo_Implementation() override; 
+	void FallDownTo(FFallDownData fallDownData);
+	virtual void FallDownTo_Implementation(FFallDownData fallDownData) override;
 	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	bool IsDead() const;
@@ -91,6 +91,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	FKillResult Kill();
 	virtual FKillResult Kill_Implementation() override;
+
+	UFUNCTION(BlueprintCallable)
+	void RespawnRocker(float pointOnRod, ERockerMovementState initialMovementState);
 
 private:
 	UFUNCTION()

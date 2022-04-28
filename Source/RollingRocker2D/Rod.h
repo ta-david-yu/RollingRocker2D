@@ -96,6 +96,9 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable)
+	FVector GetWorldLocationFromPointOnRod(float pointOnRod) const;
+
+	UFUNCTION(BlueprintCallable)
 	FVector GetLeftEndLocation() const { return GetComponentLocation() - FVector::ForwardVector * m_MovableAreaWidth * 0.5f + FVector::UpVector * m_LeftEndHeight; }
 	
 	UFUNCTION(BlueprintCallable)

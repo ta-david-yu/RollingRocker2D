@@ -6,6 +6,15 @@
 #include "UObject/Interface.h"
 #include "CanFall.generated.h"
 
+USTRUCT(BlueprintType)
+struct FFallDownData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	AActor* TargetFallDownTo;
+};
+
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, Blueprintable)
 class UCanFall : public UInterface
@@ -23,7 +32,7 @@ class ROLLINGROCKER2D_API ICanFall
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void FallDownTo();
+	void FallDownTo(FFallDownData fallDownData);
 	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void NearlyFallDownTo();

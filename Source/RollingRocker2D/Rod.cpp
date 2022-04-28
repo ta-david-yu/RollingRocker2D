@@ -70,6 +70,15 @@ void URod::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTi
 	}
 }
 
+FVector URod::GetWorldLocationFromPointOnRod(float pointOnRod) const
+{
+	FVector normalizedRodVector = GetRodVector().GetSafeNormal();
+	FVector rodCenterToWorldLocation = normalizedRodVector * pointOnRod;
+	FVector rodCenter = GetRodCenterLocation();
+	FVector pointWorldLocation = rodCenter + rodCenterToWorldLocation;
+	return pointWorldLocation;
+}
+
 double URod::GetAngle() const
 {
 	FVector rodForward = GetForwardVector().GetUnsafeNormal();

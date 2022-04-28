@@ -40,10 +40,11 @@ void ARollingRockerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 }
 
-void ARollingRockerPawn::FallDownTo_Implementation()
+void ARollingRockerPawn::FallDownTo_Implementation(FFallDownData fallDownData)
 {
 	SetActorEnableCollision(false);
 	Rocker->SetMovementState(ERockerMovementState::External);
+
 	m_FallAnimationController->PlayFallAnimationOnSceneComponent(Rocker, Rocker->GetVelocity3D(), Rocker->GetLastRotationDelta(), 50.0f);
 	
 	// Setup a delayed kill that will happen when the fall animation is done
@@ -61,6 +62,20 @@ FKillResult ARollingRockerPawn::Kill_Implementation()
 	result.Success = true;
 
 	return result;
+}
+
+void ARollingRockerPawn::RespawnRocker(float pointOnRod, ERockerMovementState initialMovementState)
+{
+	Rocker->SetLocationOnRod(pointOnRod);
+
+	FVector worldLocation = Rod->GetWorldLocationFromPointOnRod(pointOnRod) + FVector::UpVector * Rocker->GetCollisionRadius();
+	Rocker->SetWorldLocation(worldLocation);
+	Rocker->SetWorldScale3D(FVector::OneVector);
+
+	SetActorEnableCollision(true);
+	Rocker->SetMovementState(initialMovementState);
+
+	Rocker->SetConstrainedModeVelocity(0);
 }
 
 void ARollingRockerPawn::handleOnFallAnimationEnd(USceneComponent* targetSceneComponent)

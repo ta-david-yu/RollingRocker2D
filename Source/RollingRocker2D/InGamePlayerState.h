@@ -18,8 +18,11 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	int m_MaxLivesCount = 4;
 	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	int m_InitialLivesCount = 2;
+
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	int m_CurrentLivesCount = 4;
+	int m_CurrentLivesCount = 2;
 
 public:
 	UPROPERTY(BlueprintAssignable)

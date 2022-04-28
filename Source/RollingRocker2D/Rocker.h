@@ -110,7 +110,7 @@ public:
 	float GetLocationOnRod() const { return m_LocationOnRod; }
 
 	UFUNCTION(BlueprintCallable)
-	FVector GetWorldLocationFromPointOnRod(float pointOnRod) const;
+	void SetLocationOnRod(float locationOnRod) { m_LocationOnRod = locationOnRod; }
 
 	UFUNCTION(BlueprintCallable)
 	FVector GetVelocity3D() const { return m_CurrentVelocity * m_Rod->GetRodVector().GetUnsafeNormal(); }
@@ -126,6 +126,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	bool IsMovementState(ERockerMovementState state) const { return m_MovementState == state; }
+
+	UFUNCTION(BlueprintCallable)
+	void SetConstrainedModeVelocity(float velocity) { m_CurrentVelocity = 0; }
 
 	/**
 	  * Input move the rocker in free move mode manner
