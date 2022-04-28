@@ -15,6 +15,7 @@ UScrollActorLocationOnMoveForward::UScrollActorLocationOnMoveForward()
 
 void UScrollActorLocationOnMoveForward::BeginPlay()
 {
+	Super::BeginPlay();
 	m_CurrentAutoScrollSpeedMultiplier = m_InitialAutoScrollSpeedMultiplier;
 }
 
