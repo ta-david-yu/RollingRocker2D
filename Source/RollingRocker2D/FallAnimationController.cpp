@@ -53,10 +53,10 @@ void UFallAnimationController::TickComponent(float DeltaTime, ELevelTick TickTyp
 		if (m_ScaleTimer > ScaleToZeroTime)
 		{
 			m_IsAnimating = false;
+			OnAnimationEnd.Broadcast(m_TargetSceneComponent);
 		}
 	}
 }
-
 
 void UFallAnimationController::PlayFallAnimationOnSceneComponent(USceneComponent* sceneComponent, FVector initialVelocity, FRotator rotationDeltaPerFrame, float gravity)
 {
@@ -67,10 +67,12 @@ void UFallAnimationController::PlayFallAnimationOnSceneComponent(USceneComponent
 	m_Gravity = gravity;
 
 	m_ScaleTimer = 0;
+	OnAnimationBegin.Broadcast(sceneComponent);
 }
 
 void UFallAnimationController::StopFallAnimation()
 {
 	m_IsAnimating = false;
+	OnAnimationEnd.Broadcast(m_TargetSceneComponent);
 	m_TargetSceneComponent = nullptr;
 }

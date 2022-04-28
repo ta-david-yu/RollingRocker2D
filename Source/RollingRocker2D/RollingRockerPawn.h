@@ -39,14 +39,14 @@ public:
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	URod* Rod = nullptr;
 
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-	USceneComponent* RodAppearance = nullptr;
-
 	UPROPERTY(BlueprintAssignable)
 	FMoveForwardEvent OnMoveForward;
 	
 	UPROPERTY(BlueprintAssignable)
 	FFallDownEvent OnFallDown;
+
+protected:
+
 
 protected:
 	// Sets default values for this pawn's properties

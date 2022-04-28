@@ -7,6 +7,8 @@
 #include "Components/SceneComponent.h"
 #include "FallAnimationController.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FFallAnimationEvent, USceneComponent*, TargetSceneComponent);
+
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ROLLINGROCKER2D_API UFallAnimationController : public UActorComponent
@@ -17,9 +19,14 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	float ScaleToZeroTime = 1.0f;
 
-	// TODO: Reference a Curve Data
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TObjectPtr<UCurveFloat> ScalingCurve = nullptr;
+	
+	UPROPERTY(BlueprintAssignable)
+	FFallAnimationEvent OnAnimationBegin;
+	
+	UPROPERTY(BlueprintAssignable)
+	FFallAnimationEvent OnAnimationEnd;
 
 protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)

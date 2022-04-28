@@ -213,10 +213,7 @@ float URocker::InstantMoveClamp(float locationDelta)
 
 void URocker::SnapWorldLocationToRod()
 {
-	FVector normalizedRodVector = m_Rod->GetRodVector().GetSafeNormal();
-	FVector rodCenterToWorldLocation = normalizedRodVector * m_LocationOnRod;
-	FVector rodCenter = m_Rod->GetRodCenterLocation();
-	FVector rockerWorldLocation = rodCenter + rodCenterToWorldLocation + FVector::UpVector * GetCollisionRadius();
+	FVector rockerWorldLocation = GetWorldLocationFromPointOnRod(m_LocationOnRod) + FVector::UpVector * GetCollisionRadius();
 	SetWorldLocation(rockerWorldLocation, true);
 }
 
