@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "RollingRockerPawn.h"
 #include "InGamePlayerController.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPauseEvent);
@@ -32,11 +33,33 @@ public:
 	UPROPERTY(BlueprintAssignable, VisibleAnywhere)
 	FPauseEvent OnResumed;
 	
+private:
+	ARollingRockerPawn* m_RollingRockerPawn = nullptr;
+
 public:
 	virtual void SetupInputComponent() override;
 
+protected:
+	virtual void OnPossess(APawn* inPawn) override;
+
 private:
+	UFUNCTION()
 	void handleOnPauseActionPressed();
+	
+	UFUNCTION()
+	void handleOnActivateFreeMoveModeActionPressed();
+
+	UFUNCTION()
+	void handleOnFreeMoveHorizontal(float axisValue);
+
+	UFUNCTION()
+	void handleOnMoveRodLeftEnd(float axisValue);
+
+	UFUNCTION()
+	void handleOnMoveRodRightEnd(float axisValue);
+
+	UFUNCTION()
+	void handleOnMoveRodBothEnds(float axisValue);
 
 public:
 	UFUNCTION(BlueprintCallable)

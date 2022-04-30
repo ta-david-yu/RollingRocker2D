@@ -11,6 +11,23 @@ void AInGamePlayerController::SetupInputComponent()
 
 	auto& pauseActionBinding = InputComponent->BindAction(TEXT("TogglePause"), IE_Pressed, this, &AInGamePlayerController::handleOnPauseActionPressed);
 	pauseActionBinding.bExecuteWhenPaused = true;
+
+	InputComponent->BindAction(TEXT("ActivateFreeMoveMode"), IE_Pressed, this, &AInGamePlayerController::handleOnActivateFreeMoveModeActionPressed);
+	InputComponent->BindAxis(TEXT("FreeMoveHorizontal"), this, &AInGamePlayerController::handleOnFreeMoveHorizontal);
+	InputComponent->BindAxis(TEXT("MoveRodLeftEnd"), this, &AInGamePlayerController::handleOnMoveRodLeftEnd);
+	InputComponent->BindAxis(TEXT("MoveRodRightEnd"), this, &AInGamePlayerController::handleOnMoveRodRightEnd);
+	InputComponent->BindAxis(TEXT("MoveRodBothEnds"), this, &AInGamePlayerController::handleOnMoveRodBothEnds);
+}
+
+void AInGamePlayerController::OnPossess(APawn* inPawn)
+{
+	Super::OnPossess(inPawn);
+	m_RollingRockerPawn = Cast<ARollingRockerPawn>(inPawn);
+	if (!m_RollingRockerPawn->IsValidLowLevelFast())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("Possessed Pawn is not a RollingRockerPawn."));
+		return;
+	}
 }
 
 void AInGamePlayerController::handleOnPauseActionPressed()
@@ -25,6 +42,61 @@ void AInGamePlayerController::handleOnPauseActionPressed()
 	}
 
 	GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Yellow, TEXT("PAUSE PRESSED"));
+}
+
+void AInGamePlayerController::handleOnActivateFreeMoveModeActionPressed()
+{
+	auto rocker = m_RollingRockerPawn->Rocker;
+	if (rocker->IsMovementState(ERockerMovementState::External))
+	{
+		return;
+	}
+
+	if (rocker->IsMovementState(ERockerMovementState::Constrained))
+	{
+		rocker->SetMovementState(ERockerMovementState::Free);
+	}
+	else if (rocker->IsMovementState(ERockerMovementState::Free))
+	{
+		rocker->SetMovementState(ERockerMovementState::Constrained);
+	}
+}
+
+void AInGamePlayerController::handleOnFreeMoveHorizontal(float axisValue)
+{
+	auto rocker = m_RollingRockerPawn->Rocker;
+	if (rocker->IsMovementState(ERockerMovementState::Free))
+	{
+		rocker->FreeMove(axisValue);
+	}
+}
+
+void AInGamePlayerController::handleOnMoveRodLeftEnd(float axisValue)
+{
+	auto rocker = m_RollingRockerPawn->Rocker;
+	if (rocker->IsMovementState(ERockerMovementState::Constrained))
+	{
+		m_RollingRockerPawn->Rod->MoveLeftEnd(axisValue);
+	}
+}
+
+void AInGamePlayerController::handleOnMoveRodRightEnd(float axisValue)
+{
+	auto rocker = m_RollingRockerPawn->Rocker;
+	if (rocker->IsMovementState(ERockerMovementState::Constrained))
+	{
+		m_RollingRockerPawn->Rod->MoveRightEnd(axisValue);
+	}
+}
+
+void AInGamePlayerController::handleOnMoveRodBothEnds(float axisValue)
+{
+	auto rocker = m_RollingRockerPawn->Rocker;
+	if (rocker->IsMovementState(ERockerMovementState::Free))
+	{
+		m_RollingRockerPawn->Rod->MoveLeftEnd(axisValue);
+		m_RollingRockerPawn->Rod->MoveRightEnd(axisValue);
+	}
 }
 
 void AInGamePlayerController::PauseGame()
