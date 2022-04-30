@@ -27,33 +27,69 @@ void URod::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTi
 	FVector oldLeftLocation = GetLeftEndLocation();
 	FVector oldRightLocation = GetRightEndLocation();
 
-	if (!FMath::IsNearlyEqual(m_LeftEndMoveBuffer, 0))
+	if (m_IsResettingLocation)
 	{
-		float newHeight = m_LeftEndHeight + m_LeftEndMoveBuffer * DeltaTime * m_EndMaxSpeed;
-		float clampedNewHeight = FMath::Clamp(newHeight, -m_EndMovableRange * 0.5f, m_EndMovableRange * 0.5f);
+		float currentLeftEndHeight = m_LeftEndHeight;
+		float newLeftEndHeight = FMath::Lerp(currentLeftEndHeight, m_ResetEndLocation, 1.0f - FMath::Pow(0.5f, DeltaTime / m_ResetLocationHalfLifeTime));
+		bool isLeftEndReset = FMath::IsNearlyEqual(newLeftEndHeight, m_ResetEndLocation, 0.1f);
+		if (isLeftEndReset)
+		{
+			newLeftEndHeight = m_ResetEndLocation;
+		}
 
-		leftExceededHeightAmount = FMath::Sign(newHeight) * FMath::Max(FMath::Abs(newHeight) - FMath::Abs(clampedNewHeight), 0);
+		float currentRightEndHeight = m_RightEndHeight;
+		float newRightEndHeight = FMath::Lerp(currentRightEndHeight, m_ResetEndLocation, 1.0f - FMath::Pow(0.5f, DeltaTime / m_ResetLocationHalfLifeTime));
+		bool isRightEndReset = FMath::IsNearlyEqual(newRightEndHeight, m_ResetEndLocation, 0.1f);
+		if (isRightEndReset)
+		{
+			newRightEndHeight = m_ResetEndLocation;
+		}
 
-		m_LeftEndHeight = clampedNewHeight;
-		m_LeftEndMoveBuffer = 0;
+		m_LeftEndHeight = newLeftEndHeight;
+		m_RightEndHeight = newRightEndHeight;
 
 		leftEndMoved = true;
+		rightEndMoved = true;
 
 		OnLeftEndLocationChanged.Broadcast(GetLeftEndLocation());
-	}
-
-	if (!FMath::IsNearlyEqual(m_RightEndMoveBuffer, 0))
-	{
-		float newHeight = m_RightEndHeight + m_RightEndMoveBuffer * DeltaTime * m_EndMaxSpeed;
-		float clampedNewHeight = FMath::Clamp(newHeight, -m_EndMovableRange * 0.5f, m_EndMovableRange * 0.5f);
-
-		rightExceededHeightAmount = FMath::Sign(newHeight) * FMath::Max(FMath::Abs(newHeight) - FMath::Abs(clampedNewHeight), 0);
-
-		m_RightEndHeight = clampedNewHeight;
-		m_RightEndMoveBuffer = 0;
-
-		rightEndMoved = true;
 		OnRightEndLocationChanged.Broadcast(GetRightEndLocation());
+
+		if (isLeftEndReset && isRightEndReset)
+		{
+			m_IsResettingLocation = false;
+			OnResetLocationEnd.Broadcast();
+		}
+	}
+	else
+	{
+		if (!FMath::IsNearlyEqual(m_LeftEndMoveBuffer, 0))
+		{
+			float newHeight = m_LeftEndHeight + m_LeftEndMoveBuffer * DeltaTime * m_EndMaxSpeed;
+			float clampedNewHeight = FMath::Clamp(newHeight, -m_EndMovableRange * 0.5f, m_EndMovableRange * 0.5f);
+
+			leftExceededHeightAmount = FMath::Sign(newHeight) * FMath::Max(FMath::Abs(newHeight) - FMath::Abs(clampedNewHeight), 0);
+
+			m_LeftEndHeight = clampedNewHeight;
+			m_LeftEndMoveBuffer = 0;
+
+			leftEndMoved = true;
+
+			OnLeftEndLocationChanged.Broadcast(GetLeftEndLocation());
+		}
+
+		if (!FMath::IsNearlyEqual(m_RightEndMoveBuffer, 0))
+		{
+			float newHeight = m_RightEndHeight + m_RightEndMoveBuffer * DeltaTime * m_EndMaxSpeed;
+			float clampedNewHeight = FMath::Clamp(newHeight, -m_EndMovableRange * 0.5f, m_EndMovableRange * 0.5f);
+
+			rightExceededHeightAmount = FMath::Sign(newHeight) * FMath::Max(FMath::Abs(newHeight) - FMath::Abs(clampedNewHeight), 0);
+
+			m_RightEndHeight = clampedNewHeight;
+			m_RightEndMoveBuffer = 0;
+
+			rightEndMoved = true;
+			OnRightEndLocationChanged.Broadcast(GetRightEndLocation());
+		}
 	}
 
 	if (leftEndMoved || rightEndMoved)
@@ -104,10 +140,29 @@ double URod::GetSignedAngle() const
 
 void URod::MoveLeftEnd(float scalar)
 {
+	if (m_IsResettingLocation)
+	{
+		return;
+	}
+
 	m_LeftEndMoveBuffer = FMath::Clamp(scalar, -1, 1);
 }
 
 void URod::MoveRightEnd(float scalar)
 {
+	if (m_IsResettingLocation)
+	{
+		return;
+	}
+
 	m_RightEndMoveBuffer = FMath::Clamp(scalar, -1, 1);
 }
+
+void URod::ResetLocation()
+{
+	m_IsResettingLocation = true;
+	m_LeftEndMoveBuffer = 0;
+	m_RightEndMoveBuffer = 0;
+	OnResetLocationBegin.Broadcast();
+}
+

@@ -34,6 +34,7 @@ struct FRodLocationChangedEventData
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRodLocationChangedEvent, FRodLocationChangedEventData, rodLocationChangedData);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRodEndLocationChangedEvent, FVector, NewLocation);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResetLocationEvent);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ROLLINGROCKER2D_API URod : public USceneComponent
@@ -50,13 +51,12 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (ClampMin = "0", ClampMax = "50.0", UIMin = "0", UIMax = "50.0"))
 	float m_EndMaxSpeed = 10;
-
-
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	float m_LeftEndHeight = 0;
 	
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	float m_RightEndHeight = 0;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (ClampMin = "0", ClampMax = "5.0", UIMin = "0", UIMax = "5.0"))
+	float m_ResetLocationHalfLifeTime = 0.1f;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (ClampMin = "-50.0", ClampMax = "50.0", UIMin = "-50.0", UIMax = "50.0"))
+	float m_ResetEndLocation = 0.0f;
 
 public:
 	UPROPERTY(BlueprintAssignable)
@@ -67,8 +67,23 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FRodLocationChangedEvent OnRodLocationChanged;
+	
+	UPROPERTY(BlueprintAssignable)
+	FResetLocationEvent OnResetLocationBegin;
+	
+	UPROPERTY(BlueprintAssignable)
+	FResetLocationEvent OnResetLocationEnd;
 
-private:
+protected:
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	float m_LeftEndHeight = 0;
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	float m_RightEndHeight = 0;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	bool m_IsResettingLocation = false;
+
 	UPROPERTY(VisibleAnywhere)
 	float m_LeftEndMoveBuffer = 0;
 
@@ -80,6 +95,9 @@ public:
 	URod();
 
 public:
+	// Called every frame
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
 	UFUNCTION(BlueprintCallable)
 	float GetEndMovableRange() const { return m_EndMovableRange; }
 
@@ -91,9 +109,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	float GetRightEndHeight() const { return m_RightEndHeight; }
-
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable)
 	FVector GetWorldLocationFromPointOnRod(float pointOnRod) const;
@@ -121,4 +136,7 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void MoveRightEnd(float scalar);
+
+	UFUNCTION(BlueprintCallable)
+	void ResetLocation();
 };
