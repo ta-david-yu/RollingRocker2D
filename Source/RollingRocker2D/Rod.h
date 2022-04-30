@@ -56,7 +56,7 @@ protected:
 	float m_ResetLocationHalfLifeTime = 0.1f;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (ClampMin = "-50.0", ClampMax = "50.0", UIMin = "-50.0", UIMax = "50.0"))
-	float m_ResetEndLocation = 0.0f;
+	float m_DefaultResetLocationHeight = 0.0f;
 
 public:
 	UPROPERTY(BlueprintAssignable)
@@ -83,6 +83,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	bool m_IsResettingLocation = false;
+
+	UPROPERTY(VisibleAnywhere)
+	float m_ResetLocationHeight = 0;
 
 	UPROPERTY(VisibleAnywhere)
 	float m_LeftEndMoveBuffer = 0;
@@ -139,4 +142,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ResetLocation();
+	
+	UFUNCTION(BlueprintCallable)
+	void ResetLocationWithCustomHeight(float height);
 };

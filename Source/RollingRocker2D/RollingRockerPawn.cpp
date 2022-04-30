@@ -106,6 +106,23 @@ void ARollingRockerPawn::handleOnRockerMovementStateChanged(ERockerMovementState
 {
 	if (nextMovementState == ERockerMovementState::Free)
 	{
-		Rod->ResetLocation();
+		// Calculate rocker height on the rod and use that height to reset rod (Using right triangle ratio matching)
+		float currentRodLength = Rod->GetRodVector().Length();
+		float leftEndToRockerLocationLength = currentRodLength / 2 + Rocker->GetLocationOnRod();
+		float rightEndToRockerLocationLength = currentRodLength - leftEndToRockerLocationLength;
+		
+		float leftEndHeight = Rod->GetLeftEndHeight();
+		float rightEndHeight = Rod->GetRightEndHeight();
+
+		// Height = h1 + (h2 - h1) * (a / a + b)
+		// 
+		//      /|h2
+		//    b/ |
+		//    /__|
+		//  a/   |
+		//  /____|h1
+		// 
+		float rockerHeightOnRod = leftEndHeight + (rightEndHeight - leftEndHeight) * (leftEndToRockerLocationLength / (currentRodLength));
+		Rod->ResetLocationWithCustomHeight(rockerHeightOnRod);
 	}
 }

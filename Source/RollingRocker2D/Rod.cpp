@@ -30,19 +30,19 @@ void URod::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTi
 	if (m_IsResettingLocation)
 	{
 		float currentLeftEndHeight = m_LeftEndHeight;
-		float newLeftEndHeight = FMath::Lerp(currentLeftEndHeight, m_ResetEndLocation, 1.0f - FMath::Pow(0.5f, DeltaTime / m_ResetLocationHalfLifeTime));
-		bool isLeftEndReset = FMath::IsNearlyEqual(newLeftEndHeight, m_ResetEndLocation, 0.1f);
+		float newLeftEndHeight = FMath::Lerp(currentLeftEndHeight, m_ResetLocationHeight, 1.0f - FMath::Pow(0.5f, DeltaTime / m_ResetLocationHalfLifeTime));
+		bool isLeftEndReset = FMath::IsNearlyEqual(newLeftEndHeight, m_ResetLocationHeight, 0.1f);
 		if (isLeftEndReset)
 		{
-			newLeftEndHeight = m_ResetEndLocation;
+			newLeftEndHeight = m_ResetLocationHeight;
 		}
 
 		float currentRightEndHeight = m_RightEndHeight;
-		float newRightEndHeight = FMath::Lerp(currentRightEndHeight, m_ResetEndLocation, 1.0f - FMath::Pow(0.5f, DeltaTime / m_ResetLocationHalfLifeTime));
-		bool isRightEndReset = FMath::IsNearlyEqual(newRightEndHeight, m_ResetEndLocation, 0.1f);
+		float newRightEndHeight = FMath::Lerp(currentRightEndHeight, m_ResetLocationHeight, 1.0f - FMath::Pow(0.5f, DeltaTime / m_ResetLocationHalfLifeTime));
+		bool isRightEndReset = FMath::IsNearlyEqual(newRightEndHeight, m_ResetLocationHeight, 0.1f);
 		if (isRightEndReset)
 		{
-			newRightEndHeight = m_ResetEndLocation;
+			newRightEndHeight = m_ResetLocationHeight;
 		}
 
 		m_LeftEndHeight = newLeftEndHeight;
@@ -159,9 +159,14 @@ void URod::MoveRightEnd(float scalar)
 
 void URod::ResetLocation()
 {
+	ResetLocationWithCustomHeight(m_DefaultResetLocationHeight);
+}
+
+void URod::ResetLocationWithCustomHeight(float height)
+{
 	m_IsResettingLocation = true;
 	m_LeftEndMoveBuffer = 0;
 	m_RightEndMoveBuffer = 0;
+	m_ResetLocationHeight = height;
 	OnResetLocationBegin.Broadcast();
 }
-
