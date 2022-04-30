@@ -101,4 +101,7 @@ private:
 
 	UFUNCTION()
 	void handleOnRodLocationChanged(FRodLocationChangedEventData eventData);
+	
+	UFUNCTION()
+	void handleOnRockerMovementStateChanged(ERockerMovementState prevMovementState, ERockerMovementState nextMovementState);
 };

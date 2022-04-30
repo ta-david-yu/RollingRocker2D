@@ -19,6 +19,9 @@ enum class ERockerMovementState : uint8
 	External UMETA(ToolTip="No movement is applied, can be used to play external force or simply freeze Rocker in location")
 };
 
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRockerMovementStateChangedEvent, ERockerMovementState, prevMovementState, ERockerMovementState, nextMovementState);
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ROLLINGROCKER2D_API URocker : public USceneComponent
 {
@@ -79,6 +82,9 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	FRotator m_LastRotationDelta;
+
+public:
+	FRockerMovementStateChangedEvent OnMovementStateChanged;
 
 private:
 	UPROPERTY(VisibleAnywhere)

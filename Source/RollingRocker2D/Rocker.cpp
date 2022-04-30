@@ -159,6 +159,8 @@ void URocker::SetMovementState(ERockerMovementState state)
 	{
 		m_CurrentVelocity = 0;
 	}
+
+	OnMovementStateChanged.Broadcast(prevState, m_MovementState);
 }
 
 void URocker::FreeMove(float moveDirection)

@@ -73,7 +73,6 @@ void URod::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTi
 			m_LeftEndMoveBuffer = 0;
 
 			leftEndMoved = true;
-
 			OnLeftEndLocationChanged.Broadcast(GetLeftEndLocation());
 		}
 

@@ -31,6 +31,7 @@ void ARollingRockerPawn::BeginPlay()
 
 	// Register Events
 	Rod->OnRodLocationChanged.AddDynamic(this, &ARollingRockerPawn::handleOnRodLocationChanged);
+	Rocker->OnMovementStateChanged.AddDynamic(this, &ARollingRockerPawn::handleOnRockerMovementStateChanged);
 }
 
 // Called to bind functionality to input
@@ -99,4 +100,12 @@ void ARollingRockerPawn::handleOnRodLocationChanged(FRodLocationChangedEventData
 	FMoveForwardEventData data{ };
 	data.MoveAmount = leftExceededAmount > rightExceededAmount ? leftExceededAmount : rightExceededAmount;
 	OnMoveForward.Broadcast(data);
+}
+
+void ARollingRockerPawn::handleOnRockerMovementStateChanged(ERockerMovementState prevMovementState, ERockerMovementState nextMovementState)
+{
+	if (nextMovementState == ERockerMovementState::Free)
+	{
+		Rod->ResetLocation();
+	}
 }

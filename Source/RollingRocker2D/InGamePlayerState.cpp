@@ -31,6 +31,10 @@ void AInGamePlayerState::SetCurrentLivesCount(int newLivesCount)
 
 void AInGamePlayerState::handleOnRollingRockerPawnDied(FDeathEventData deathEventData)
 {
+	// Reduce life
 	int newLivesCount = m_CurrentLivesCount - 1;
 	SetCurrentLivesCount(newLivesCount);
+
+	// Reset Rod location
+	m_RollingRockerPawn->Rod->ResetLocation();
 }
