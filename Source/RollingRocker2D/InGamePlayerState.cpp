@@ -78,27 +78,37 @@ void AInGamePlayerState::SetCurrentLivesCount(int newLivesCount)
 
 void AInGamePlayerState::handleOnRollingRockerPawnDied(FDeathEventData deathEventData)
 {
-	// Reduce life
-	int newLivesCount = m_CurrentLivesCount - 1;
-	SetCurrentLivesCount(newLivesCount);
-
-	// Reset Rod location
-	m_RollingRockerPawn->Rod->ResetLocation();
-
-	// Enable respawn location selector and setup timer
-	if (!m_RespawnLocationSelector->IsValidLowLevelFast())
+	if (m_CurrentLivesCount > 0)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("PlayerState's m_RespawnLocationSelector is not spawned properly."));
-		return;
-	}
-	m_RespawnLocationSelector->SetActorHiddenInGame(false);
-	m_RespawnLocationSelector->StartSelection(GetPlayerController(), m_RollingRockerPawn->Rod);
+		// There is still enough lives left, activate respawn state
 
-	m_RespawnStateTimer = 0.0f;
+		// Reset Rod location
+		m_RollingRockerPawn->Rod->ResetLocation();
+
+		// Enable respawn location selector and setup timer
+		if (!m_RespawnLocationSelector->IsValidLowLevelFast())
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("PlayerState's m_RespawnLocationSelector is not spawned properly."));
+			return;
+		}
+		m_RespawnLocationSelector->SetActorHiddenInGame(false);
+		m_RespawnLocationSelector->StartSelection(GetPlayerController(), m_RollingRockerPawn->Rod);
+
+		m_RespawnStateTimer = 0.0f;
+	}
+	else
+	{
+		// TODO: Game over UI stuff
+	}
 }
 
 
 void AInGamePlayerState::handleOnRespawnLocationSelectionEnd(float locationOnRod)
 {
+	// TEMP
+	m_RespawnLocationSelector->SetActorHiddenInGame(true);
+
 	m_RollingRockerPawn->RespawnRocker(locationOnRod, ERockerMovementState::Constrained);
+
+	SetCurrentLivesCount(m_CurrentLivesCount - 1);
 }

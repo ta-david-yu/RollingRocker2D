@@ -49,7 +49,6 @@ void AOnRodRespawnLocationSelector::Tick(float DeltaTime)
 	{
 		// Move
 		float actualAppliedDelta = m_OnRodScene->InstantMoveClamp(locationOnRodDelta);
-		//RotateWithLocationDelta(actualAppliedDelta);
 	}
 }
 
