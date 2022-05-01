@@ -7,6 +7,7 @@
 #include "Components/SceneComponent.h"
 #include "Components/SphereComponent.h"
 #include "Rod.h"
+#include "OnRodSceneComponent.h"
 #include "PaperSprite.h"
 #include "PaperSpriteComponent.h"
 #include "Rocker.generated.h"
@@ -30,7 +31,7 @@ class ROLLINGROCKER2D_API URocker : public USceneComponent
 protected:
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	URod* m_Rod = nullptr;
-
+	
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	USphereComponent* m_SphereCollision = nullptr;
 	

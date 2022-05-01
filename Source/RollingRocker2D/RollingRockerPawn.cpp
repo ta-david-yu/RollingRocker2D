@@ -67,11 +67,14 @@ FKillResult ARollingRockerPawn::Kill_Implementation()
 
 void ARollingRockerPawn::RespawnRocker(float pointOnRod, ERockerMovementState initialMovementState)
 {
+	m_IsDead = false;
+
 	Rocker->SetLocationOnRod(pointOnRod);
 
 	FVector worldLocation = Rod->GetWorldLocationFromPointOnRod(pointOnRod) + FVector::UpVector * Rocker->GetCollisionRadius();
 	Rocker->SetWorldLocation(worldLocation);
 	Rocker->SetWorldScale3D(FVector::OneVector);
+	Rocker->SetWorldRotation(FRotator::ZeroRotator);
 
 	SetActorEnableCollision(true);
 	Rocker->SetMovementState(initialMovementState);

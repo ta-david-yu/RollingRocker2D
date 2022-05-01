@@ -12,10 +12,11 @@ void AInGamePlayerController::SetupInputComponent()
 	auto& pauseActionBinding = InputComponent->BindAction(TEXT("TogglePause"), IE_Pressed, this, &AInGamePlayerController::handleOnPauseActionPressed);
 	pauseActionBinding.bExecuteWhenPaused = true;
 
-	InputComponent->BindAction(TEXT("ActivateFreeMoveMode"), IE_Pressed, this, &AInGamePlayerController::handleOnActivateFreeMoveModeActionPressed);
-	InputComponent->BindAxis(TEXT("FreeMoveHorizontal"), this, &AInGamePlayerController::handleOnFreeMoveHorizontal);
 	InputComponent->BindAxis(TEXT("MoveRodLeftEnd"), this, &AInGamePlayerController::handleOnMoveRodLeftEnd);
 	InputComponent->BindAxis(TEXT("MoveRodRightEnd"), this, &AInGamePlayerController::handleOnMoveRodRightEnd);
+
+	InputComponent->BindAction(TEXT("ActivateFreeMoveMode"), IE_Pressed, this, &AInGamePlayerController::handleOnActivateFreeMoveModeActionPressed);
+	InputComponent->BindAxis(TEXT("FreeMoveHorizontal"), this, &AInGamePlayerController::handleOnFreeMoveHorizontal);
 	InputComponent->BindAxis(TEXT("MoveRodBothEnds"), this, &AInGamePlayerController::handleOnMoveRodBothEnds);
 }
 
@@ -92,7 +93,7 @@ void AInGamePlayerController::handleOnMoveRodRightEnd(float axisValue)
 void AInGamePlayerController::handleOnMoveRodBothEnds(float axisValue)
 {
 	auto rocker = m_RollingRockerPawn->Rocker;
-	if (rocker->IsMovementState(ERockerMovementState::Free))
+	if (rocker->IsMovementState(ERockerMovementState::Free) || m_RollingRockerPawn->IsDead())
 	{
 		m_RollingRockerPawn->Rod->MoveLeftEnd(axisValue);
 		m_RollingRockerPawn->Rod->MoveRightEnd(axisValue);
