@@ -57,8 +57,8 @@ void AInGamePlayerState::Tick(float deltaTime)
 		return;
 	}
 
-	GEngine->AddOnScreenDebugMessage(-1, deltaTime, FColor::Blue, StaticEnum<EPlayerState>()->GetValueAsString(m_PlayerState));
-	if (m_PlayerState == EPlayerState::WaitingForRespawn)
+	GEngine->AddOnScreenDebugMessage(-1, deltaTime, FColor::Blue, StaticEnum<EGameFlowState>()->GetValueAsString(m_GameFlowState));
+	if (m_GameFlowState == EGameFlowState::WaitingForRespawn)
 	{
 		m_StateTimer += deltaTime;
 		if (m_StateTimer < m_WaitingForRespawnTime)
@@ -79,7 +79,7 @@ void AInGamePlayerState::Tick(float deltaTime)
 			// Enable respawn location selector and setup timer
 			m_RespawnLocationSelector->StartSelection(GetPlayerController(), rod);
 
-			SetPlayerState(EPlayerState::Respawning);
+			SetGameFlowState(EGameFlowState::Respawning);
 			m_StateTimer = 0.0f;
 		}
 		else
@@ -95,10 +95,10 @@ void AInGamePlayerState::Tick(float deltaTime)
 			playerController->SetInputMode(FInputModeGameAndUI());
 			playerController->bShowMouseCursor = true;
 
-			SetPlayerState(EPlayerState::GameOver);
+			SetGameFlowState(EGameFlowState::GameOver);
 		}
 	}
-	else if (m_PlayerState == EPlayerState::Respawning)
+	else if (m_GameFlowState == EGameFlowState::Respawning)
 	{
 		m_StateTimer += deltaTime;
 		if (m_StateTimer < m_RespawningTime)
@@ -118,25 +118,25 @@ void AInGamePlayerState::SetCurrentLivesCount(int newLivesCount)
 	OnCurrentLivesCountChanged.Broadcast(prevLivesCount, m_CurrentLivesCount);
 }
 
-void AInGamePlayerState::SetPlayerState(EPlayerState playerState)
+void AInGamePlayerState::SetGameFlowState(EGameFlowState playerState)
 {
-	EPlayerState prevState = m_PlayerState;
-	m_PlayerState = playerState;
+	EGameFlowState prevState = m_GameFlowState;
+	m_GameFlowState = playerState;
 
-	OnStateChanged.Broadcast(prevState, m_PlayerState);
+	OnStateChanged.Broadcast(prevState, m_GameFlowState);
 }
 
 void AInGamePlayerState::handleOnRollingRockerPawnDied(FDeathEventData deathEventData)
 {
 	// Activate waiting for respawn state
-	SetPlayerState(EPlayerState::WaitingForRespawn);
+	SetGameFlowState(EGameFlowState::WaitingForRespawn);
 	m_StateTimer = 0.0f;
 }
 
 
 void AInGamePlayerState::handleOnRespawnLocationSelectionEnd(float locationOnRod)
 {
-	SetPlayerState(EPlayerState::Normal);
+	SetGameFlowState(EGameFlowState::Normal);
 	m_StateTimer = 0.0f;
 
 	m_RollingRockerPawn->RespawnRocker(locationOnRod, ERockerMovementState::Constrained);

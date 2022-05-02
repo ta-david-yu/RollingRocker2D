@@ -82,7 +82,7 @@ void AInGamePlayerController::handleOnMoveRodBothEnds(float axisValue)
 	auto rocker = m_RollingRockerPawn->Rocker;
 	auto playerState = GetPlayerState<AInGamePlayerState>();
 
-	if (rocker->IsMovementState(ERockerMovementState::Free) || playerState->GetPlayerState() == EPlayerState::Respawning)
+	if (rocker->IsMovementState(ERockerMovementState::Free) || playerState->GetGameFlowState() == EGameFlowState::Respawning)
 	{
 		m_RollingRockerPawn->Rod->MoveLeftEnd(axisValue);
 		m_RollingRockerPawn->Rod->MoveRightEnd(axisValue);
@@ -93,7 +93,7 @@ void AInGamePlayerController::handleOnPauseActionPressed()
 {
 	auto playerState = GetPlayerState<AInGamePlayerState>();
 
-	if (playerState->GetPlayerState() == EPlayerState::GameOver)
+	if (playerState->GetGameFlowState() == EGameFlowState::GameOver)
 	{
 		return;
 	}

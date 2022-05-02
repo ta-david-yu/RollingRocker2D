@@ -9,7 +9,7 @@
 #include "InGamePlayerState.generated.h"
 
 UENUM(BlueprintType)
-enum class EPlayerState : uint8
+enum class EGameFlowState : uint8
 {
 	Normal UMETA(ToolTip = "The Rocker is on the rod, normal gameplay state"),
 	WaitingForRespawn UMETA(ToolTip = "The state before the player can choose a respawn location"),
@@ -18,7 +18,7 @@ enum class EPlayerState : uint8
 };
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FPlayerStateChangedEvent, EPlayerState, prevState, EPlayerState, newState);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FGameFlowStateChangedEvent, EGameFlowState, prevState, EGameFlowState, newState);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FLivesCountEvent, int, prevLivesCount, int, newLivesCount);
 
 UCLASS()
@@ -50,11 +50,11 @@ protected:
 	int m_CurrentLivesCount = 2;
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	EPlayerState m_PlayerState = EPlayerState::Normal;
+	EGameFlowState m_GameFlowState = EGameFlowState::Normal;
 
 public:
 	UPROPERTY(BlueprintAssignable)
-	FPlayerStateChangedEvent OnStateChanged;
+	FGameFlowStateChangedEvent OnStateChanged;
 
 	UPROPERTY(BlueprintAssignable)
 	FLivesCountEvent OnCurrentLivesCountChanged;
@@ -83,10 +83,10 @@ public:
 	void SetCurrentLivesCount(int newLivesCount);
 
 	UFUNCTION(BlueprintCallable)
-	void SetPlayerState(EPlayerState playerState);
+	void SetGameFlowState(EGameFlowState playerState);
 	
 	UFUNCTION(BlueprintCallable)
-	EPlayerState GetPlayerState() const { return m_PlayerState; }
+	EGameFlowState GetGameFlowState() const { return m_GameFlowState; }
 private:
 	UFUNCTION()
 	void handleOnRollingRockerPawnDied(FDeathEventData deathEventData);
