@@ -72,9 +72,7 @@ void ARollingRockerPawn::RespawnRocker(float pointOnRod, ERockerMovementState in
 	Rocker->SetLocationOnRod(pointOnRod);
 
 	FVector worldLocation = Rod->GetWorldLocationFromPointOnRod(pointOnRod) + FVector::UpVector * Rocker->GetCollisionRadius();
-	Rocker->SetWorldLocation(worldLocation);
-	Rocker->SetWorldScale3D(FVector::OneVector);
-	Rocker->SetWorldRotation(FRotator::ZeroRotator);
+	Rocker->SetWorldTransform(FTransform{ FRotator::ZeroRotator, worldLocation, FVector::OneVector });
 
 	SetActorEnableCollision(true);
 	Rocker->SetMovementState(initialMovementState);

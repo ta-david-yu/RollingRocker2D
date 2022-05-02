@@ -2,6 +2,7 @@
 
 
 #include "InGamePlayerController.h"
+#include "InGamePlayerState.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -33,6 +34,13 @@ void AInGamePlayerController::OnPossess(APawn* inPawn)
 
 void AInGamePlayerController::handleOnPauseActionPressed()
 {
+	auto playerState = GetPlayerState<AInGamePlayerState>();
+
+	if (playerState->GetPlayerState() == EPlayerState::GameOver)
+	{
+		return;
+	}
+
 	if (m_IsGamePaused)
 	{
 		ResumeGame();
@@ -75,7 +83,7 @@ void AInGamePlayerController::handleOnFreeMoveHorizontal(float axisValue)
 void AInGamePlayerController::handleOnMoveRodLeftEnd(float axisValue)
 {
 	auto rocker = m_RollingRockerPawn->Rocker;
-	if (rocker->IsMovementState(ERockerMovementState::Constrained))
+	if (!rocker->IsMovementState(ERockerMovementState::Free))
 	{
 		m_RollingRockerPawn->Rod->MoveLeftEnd(axisValue);
 	}
@@ -84,7 +92,7 @@ void AInGamePlayerController::handleOnMoveRodLeftEnd(float axisValue)
 void AInGamePlayerController::handleOnMoveRodRightEnd(float axisValue)
 {
 	auto rocker = m_RollingRockerPawn->Rocker;
-	if (rocker->IsMovementState(ERockerMovementState::Constrained))
+	if (!rocker->IsMovementState(ERockerMovementState::Free))
 	{
 		m_RollingRockerPawn->Rod->MoveRightEnd(axisValue);
 	}
@@ -93,7 +101,9 @@ void AInGamePlayerController::handleOnMoveRodRightEnd(float axisValue)
 void AInGamePlayerController::handleOnMoveRodBothEnds(float axisValue)
 {
 	auto rocker = m_RollingRockerPawn->Rocker;
-	if (rocker->IsMovementState(ERockerMovementState::Free) || m_RollingRockerPawn->IsDead())
+	auto playerState = GetPlayerState<AInGamePlayerState>();
+
+	if (rocker->IsMovementState(ERockerMovementState::Free) || playerState->GetPlayerState() == EPlayerState::Respawning)
 	{
 		m_RollingRockerPawn->Rod->MoveLeftEnd(axisValue);
 		m_RollingRockerPawn->Rod->MoveRightEnd(axisValue);

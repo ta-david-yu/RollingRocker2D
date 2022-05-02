@@ -2,6 +2,8 @@
 
 
 #include "InGamePlayerState.h"
+#include "Blueprint/UserWidget.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AInGamePlayerState::AInGamePlayerState()
@@ -56,14 +58,54 @@ void AInGamePlayerState::Tick(float deltaTime)
 		return;
 	}
 
-	if (!m_RespawnLocationSelector->IsSelecting())
+	GEngine->AddOnScreenDebugMessage(-1, deltaTime, FColor::Blue, StaticEnum<EPlayerState>()->GetValueAsString(m_PlayerState));
+	if (m_PlayerState == EPlayerState::WaitingForRespawn)
 	{
-		return;
-	}
+		m_StateTimer += deltaTime;
+		if (m_StateTimer < m_WaitingForRespawnTime)
+		{
+			return;
+		}
 
-	m_RespawnStateTimer += deltaTime;
-	if (m_RespawnStateTimer > m_RespawnStateTime)
+		if (m_CurrentLivesCount > 0)
+		{
+			// Reduce one life and enter respawn state
+			SetCurrentLivesCount(m_CurrentLivesCount - 1);
+
+			// Reset Rod location
+			m_RollingRockerPawn->Rod->ResetLocation();
+
+			// Enable respawn location selector and setup timer
+			m_RespawnLocationSelector->SetActorHiddenInGame(false);
+			m_RespawnLocationSelector->StartSelection(GetPlayerController(), m_RollingRockerPawn->Rod);
+
+			SetPlayerState(EPlayerState::Respawning);
+			m_StateTimer = 0.0f;
+		}
+		else
+		{
+			// Show GameOver UI Menu
+			auto gameOverMenu = CreateWidget(GetWorld(), m_GameOverMenuType);
+			if (gameOverMenu->IsValidLowLevel())
+			{
+				gameOverMenu->AddToViewport();
+			}
+
+			auto playerController = GetPlayerController();
+			playerController->SetInputMode(FInputModeGameAndUI());
+			playerController->bShowMouseCursor = true;
+
+			SetPlayerState(EPlayerState::GameOver);
+		}
+	}
+	else if (m_PlayerState == EPlayerState::Respawning)
 	{
+		m_StateTimer += deltaTime;
+		if (m_StateTimer < m_RespawningTime)
+		{
+			return;
+		}
+
 		// Respawn time is up! End the selection phase
 		m_RespawnLocationSelector->EndSelection();
 	}
@@ -76,30 +118,17 @@ void AInGamePlayerState::SetCurrentLivesCount(int newLivesCount)
 	OnCurrentLivesCountChanged.Broadcast(prevLivesCount, m_CurrentLivesCount);
 }
 
+void AInGamePlayerState::SetPlayerState(EPlayerState playerState)
+{
+	EPlayerState prevState = m_PlayerState;
+	m_PlayerState = playerState;
+}
+
 void AInGamePlayerState::handleOnRollingRockerPawnDied(FDeathEventData deathEventData)
 {
-	if (m_CurrentLivesCount > 0)
-	{
-		// There is still enough lives left, activate respawn state
-
-		// Reset Rod location
-		m_RollingRockerPawn->Rod->ResetLocation();
-
-		// Enable respawn location selector and setup timer
-		if (!m_RespawnLocationSelector->IsValidLowLevelFast())
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("PlayerState's m_RespawnLocationSelector is not spawned properly."));
-			return;
-		}
-		m_RespawnLocationSelector->SetActorHiddenInGame(false);
-		m_RespawnLocationSelector->StartSelection(GetPlayerController(), m_RollingRockerPawn->Rod);
-
-		m_RespawnStateTimer = 0.0f;
-	}
-	else
-	{
-		// TODO: Game over UI stuff
-	}
+	// Activate waiting for respawn state
+	SetPlayerState(EPlayerState::WaitingForRespawn);
+	m_StateTimer = 0.0f;
 }
 
 
@@ -110,5 +139,6 @@ void AInGamePlayerState::handleOnRespawnLocationSelectionEnd(float locationOnRod
 
 	m_RollingRockerPawn->RespawnRocker(locationOnRod, ERockerMovementState::Constrained);
 
-	SetCurrentLivesCount(m_CurrentLivesCount - 1);
+	SetPlayerState(EPlayerState::Normal);
+	m_StateTimer = 0.0f;
 }
