@@ -56,6 +56,9 @@ void ARollingRockerPawn::FallDownTo_Implementation(FFallDownData fallDownData)
 
 FKillResult ARollingRockerPawn::Kill_Implementation()
 {
+	SetActorEnableCollision(false);
+	Rocker->SetMovementState(ERockerMovementState::External);
+
 	m_IsDead = true;
 	OnDied.Broadcast(FDeathEventData { });
 	
