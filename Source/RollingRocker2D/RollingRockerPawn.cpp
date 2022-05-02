@@ -69,6 +69,8 @@ void ARollingRockerPawn::RespawnRocker(float pointOnRod, ERockerMovementState in
 {
 	m_IsDead = false;
 
+	Rocker->SetConstrainedModeVelocity(0);
+
 	Rocker->SetLocationOnRod(pointOnRod);
 
 	FVector worldLocation = Rod->GetWorldLocationFromPointOnRod(pointOnRod) + FVector::UpVector * Rocker->GetCollisionRadius();
@@ -76,8 +78,6 @@ void ARollingRockerPawn::RespawnRocker(float pointOnRod, ERockerMovementState in
 
 	SetActorEnableCollision(true);
 	Rocker->SetMovementState(initialMovementState);
-
-	Rocker->SetConstrainedModeVelocity(0);
 }
 
 void ARollingRockerPawn::handleOnFallAnimationEnd(USceneComponent* targetSceneComponent)
