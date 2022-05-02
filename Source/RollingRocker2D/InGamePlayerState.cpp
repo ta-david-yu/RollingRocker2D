@@ -72,10 +72,12 @@ void AInGamePlayerState::Tick(float deltaTime)
 			SetCurrentLivesCount(m_CurrentLivesCount - 1);
 
 			// Reset Rod location
-			m_RollingRockerPawn->Rod->ResetLocation();
+			auto rod = m_RollingRockerPawn->Rod;
+			float avergeHeight = (rod->GetLeftEndHeight() + rod->GetRightEndHeight()) * 0.5f;
+			rod->ResetLocationWithCustomHeight(avergeHeight);
 
 			// Enable respawn location selector and setup timer
-			m_RespawnLocationSelector->StartSelection(GetPlayerController(), m_RollingRockerPawn->Rod);
+			m_RespawnLocationSelector->StartSelection(GetPlayerController(), rod);
 
 			SetPlayerState(EPlayerState::Respawning);
 			m_StateTimer = 0.0f;
@@ -134,8 +136,8 @@ void AInGamePlayerState::handleOnRollingRockerPawnDied(FDeathEventData deathEven
 
 void AInGamePlayerState::handleOnRespawnLocationSelectionEnd(float locationOnRod)
 {
-	m_RollingRockerPawn->RespawnRocker(locationOnRod, ERockerMovementState::Constrained);
-
 	SetPlayerState(EPlayerState::Normal);
 	m_StateTimer = 0.0f;
+
+	m_RollingRockerPawn->RespawnRocker(locationOnRod, ERockerMovementState::Constrained);
 }

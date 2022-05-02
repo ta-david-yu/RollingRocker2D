@@ -7,6 +7,15 @@
 #include "Killable.generated.h"
 
 USTRUCT(BlueprintType)
+struct FKillParameters
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool PlayDefaultDeathAnimation = false;
+};
+
+USTRUCT(BlueprintType)
 struct FKillResult
 {
 	GENERATED_BODY()
@@ -35,5 +44,5 @@ public:
 	bool IsDead() const;
 	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	FKillResult Kill();
+	FKillResult Kill(FKillParameters killParameters);
 };

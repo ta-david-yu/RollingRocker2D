@@ -54,17 +54,26 @@ void ARollingRockerPawn::FallDownTo_Implementation(FFallDownData fallDownData)
 	OnFallDown.Broadcast(FFallDownEventData{});
 }
 
-FKillResult ARollingRockerPawn::Kill_Implementation()
+FKillResult ARollingRockerPawn::Kill_Implementation(FKillParameters killParameters)
 {
+	FKillResult result{ };
+
+	if (m_IsDead)
+	{
+		result.Success = false;
+		return result;
+	}
+
 	SetActorEnableCollision(false);
 	Rocker->SetMovementState(ERockerMovementState::External);
 
 	m_IsDead = true;
-	OnDied.Broadcast(FDeathEventData { });
-	
-	FKillResult result { };
-	result.Success = true;
 
+	FDeathEventData deathEventData {};
+	deathEventData.IsDefaultDeath = killParameters.PlayDefaultDeathAnimation;
+	OnDied.Broadcast(deathEventData);
+	
+	result.Success = true;
 	return result;
 }
 
@@ -73,19 +82,21 @@ void ARollingRockerPawn::RespawnRocker(float pointOnRod, ERockerMovementState in
 	m_IsDead = false;
 
 	Rocker->SetConstrainedModeVelocity(0);
-
 	Rocker->SetLocationOnRod(pointOnRod);
-
 	FVector worldLocation = Rod->GetWorldLocationFromPointOnRod(pointOnRod) + FVector::UpVector * Rocker->GetCollisionRadius();
 	Rocker->SetWorldTransform(FTransform{ FRotator::ZeroRotator, worldLocation, FVector::OneVector });
 
-	SetActorEnableCollision(true);
 	Rocker->SetMovementState(initialMovementState);
+	OnRespawned.Broadcast();
+
+	SetActorEnableCollision(true);
 }
 
 void ARollingRockerPawn::handleOnFallAnimationEnd(USceneComponent* targetSceneComponent)
 {
-	Kill();
+	FKillParameters killParameters {};
+	killParameters.PlayDefaultDeathAnimation = false;
+	Kill(killParameters);
 	m_FallAnimationController->OnAnimationEnd.RemoveDynamic(this, &ARollingRockerPawn::handleOnFallAnimationEnd);
 }
 

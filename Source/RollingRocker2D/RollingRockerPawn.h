@@ -7,6 +7,7 @@
 #include "Rod.h"
 #include "Rocker.h"
 #include "FallAnimationController.h"
+#include "TweenComponent.h"
 #include "CanFall.h"
 #include "Killable.h"
 #include "RollingRockerPawn.generated.h"
@@ -30,11 +31,15 @@ USTRUCT(BlueprintType)
 struct FDeathEventData
 {
 	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool IsDefaultDeath = false;
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveForwardEvent, FMoveForwardEventData, moveForwardEventData);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FFallDownEvent, FFallDownEventData, fallDownEventData);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDeathEvent, FDeathEventData, deathEventData);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRespawnEvent);
 
 UCLASS()
 class ROLLINGROCKER2D_API ARollingRockerPawn : public APawn, public ICanFall, public IKillable
@@ -56,6 +61,9 @@ public:
 	
 	UPROPERTY(BlueprintAssignable)
 	FDeathEvent OnDied;
+	
+	UPROPERTY(BlueprintAssignable)
+	FRespawnEvent OnRespawned;
 
 protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
@@ -63,9 +71,6 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	bool m_IsDead = false;
-
-private:
-	FTimerHandle m_FallKillDelayedTimerHandle;
 
 protected:
 	// Sets default values for this pawn's properties
@@ -89,8 +94,8 @@ public:
 	virtual bool IsDead_Implementation() const override { return m_IsDead; }
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	FKillResult Kill();
-	virtual FKillResult Kill_Implementation() override;
+	FKillResult Kill(FKillParameters killParameters);
+	virtual FKillResult Kill_Implementation(FKillParameters killParameters) override;
 
 	UFUNCTION(BlueprintCallable)
 	void RespawnRocker(float pointOnRod, ERockerMovementState initialMovementState);

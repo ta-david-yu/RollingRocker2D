@@ -20,7 +20,11 @@ void UTweenComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	
+
+	if (!m_TweenCurve->IsValidLowLevelFast())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("TweenCompoment's Curve is not valid. A linear curve from 0 to 1 will be used instead."));
+	}
 }
 
 
@@ -47,7 +51,7 @@ void UTweenComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 		}
 		else
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, TEXT("TweenCompoment's Curve is not valid. Tween Update will not be called."));
+			OnTweenUpdate.Broadcast(tProgress);
 		}
 
 		if (m_Timer >= m_Duration)
