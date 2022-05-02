@@ -21,10 +21,13 @@ protected:
 	bool m_IsAutoScrolling = true;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (ClampMin = "0", ClampMax = "100.0", UIMin = "0", UIMax = "100.0"))
-	float m_InitialAutoScrollSpeedMultiplier = 1.0f;
+	float m_InitialAutoScrollSpeed = 10.0f;
 	
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-	float m_CurrentAutoScrollSpeedMultiplier = 1.0f;
+	float m_CurrentAutoScrollSpeed = 10.0f;
+	
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	float m_AutoScrollSpeedMultiplier = 1.0f;
 
 public:	
 	// Sets default values for this component's properties

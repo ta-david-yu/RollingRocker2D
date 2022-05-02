@@ -16,7 +16,7 @@ UScrollActorLocationOnMoveForward::UScrollActorLocationOnMoveForward()
 void UScrollActorLocationOnMoveForward::BeginPlay()
 {
 	Super::BeginPlay();
-	m_CurrentAutoScrollSpeedMultiplier = m_InitialAutoScrollSpeedMultiplier;
+	m_CurrentAutoScrollSpeed = m_InitialAutoScrollSpeed;
 }
 
 void UScrollActorLocationOnMoveForward::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -26,7 +26,7 @@ void UScrollActorLocationOnMoveForward::TickComponent(float DeltaTime, ELevelTic
 		return;
 	}
 
-	Scroll(FVector::DownVector * DeltaTime * m_CurrentAutoScrollSpeedMultiplier);
+	Scroll(FVector::DownVector * DeltaTime * m_CurrentAutoScrollSpeed * m_AutoScrollSpeedMultiplier);
 }
 
 void UScrollActorLocationOnMoveForward::HandleOnMoveForward(FMoveForwardEventData moveForwardEventData)
