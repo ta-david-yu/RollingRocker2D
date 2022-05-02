@@ -8,7 +8,17 @@
 #include "Rod.h"
 #include "OnRodRespawnLocationSelector.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSelectionEvent, float, locationOnRod);
+USTRUCT(BlueprintType)
+struct FSelectionStartEventData
+{
+	GENERATED_BODY()
+		
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class AInGamePlayerState* PlayerState;
+};
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSelectionStartEvent, FSelectionStartEventData, selectionStartEventData);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSelectionEndEvent, float, locationOnRod);
 
 UCLASS(BlueprintType)
 class ROLLINGROCKER2D_API AOnRodRespawnLocationSelector : public AActor
@@ -21,10 +31,10 @@ protected:
 
 public:
 	UPROPERTY(BlueprintAssignable)
-	FSelectionEvent OnSelectionStart;
+	FSelectionStartEvent OnSelectionStart;
 	
 	UPROPERTY(BlueprintAssignable)
-	FSelectionEvent OnSelectionEnd;
+	FSelectionEndEvent OnSelectionEnd;
 
 protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)

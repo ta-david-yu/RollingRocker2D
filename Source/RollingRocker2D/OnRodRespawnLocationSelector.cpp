@@ -2,6 +2,7 @@
 
 
 #include "OnRodRespawnLocationSelector.h"
+#include "InGamePlayerState.h"
 
 // Sets default values
 AOnRodRespawnLocationSelector::AOnRodRespawnLocationSelector()
@@ -50,6 +51,10 @@ void AOnRodRespawnLocationSelector::Tick(float DeltaTime)
 		// Move
 		float actualAppliedDelta = m_OnRodScene->InstantMoveClamp(locationOnRodDelta);
 	}
+	else
+	{
+		m_OnRodScene->SnapWorldLocationToRod();
+	}
 }
 
 void AOnRodRespawnLocationSelector::StartSelection(APlayerController* playerController, URod* rod)
@@ -64,7 +69,10 @@ void AOnRodRespawnLocationSelector::StartSelection(APlayerController* playerCont
 	m_OnRodScene->SetLocationOnRod(0);
 	m_OnRodScene->SnapWorldLocationToRod();
 
-	OnSelectionStart.Broadcast(0);
+	FSelectionStartEventData eventData {};
+	eventData.PlayerState = playerController->GetPlayerState<AInGamePlayerState>();
+
+	OnSelectionStart.Broadcast(eventData);
 }
 
 void AOnRodRespawnLocationSelector::EndSelection()

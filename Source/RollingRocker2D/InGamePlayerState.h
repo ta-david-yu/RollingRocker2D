@@ -61,6 +61,7 @@ private:
 	AOnRodRespawnLocationSelector* m_RespawnLocationSelector = nullptr;
 
 	float m_StateTimer = 0.0f;
+
 public:
 	AInGamePlayerState();
 
@@ -70,6 +71,9 @@ protected:
 
 public:
 	virtual void Tick(float deltaTime) override;
+
+	UFUNCTION(BlueprintCallable)
+	float GetStateTimer() const { return m_StateTimer; }
 
 	UFUNCTION(BlueprintCallable)
 	void SetCurrentLivesCount(int newLivesCount);

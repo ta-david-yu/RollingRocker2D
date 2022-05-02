@@ -44,9 +44,6 @@ protected:
 
 private:
 	UFUNCTION()
-	void handleOnPauseActionPressed();
-	
-	UFUNCTION()
 	void handleOnActivateFreeMoveModeActionPressed();
 
 	UFUNCTION()
@@ -60,7 +57,10 @@ private:
 
 	UFUNCTION()
 	void handleOnMoveRodBothEnds(float axisValue);
-
+	
+	UFUNCTION()
+	void handleOnPauseActionPressed();
+	
 public:
 	UFUNCTION(BlueprintCallable)
 	void PauseGame();
