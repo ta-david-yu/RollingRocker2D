@@ -18,6 +18,7 @@ enum class EPlayerState : uint8
 };
 
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FPlayerStateChangedEvent, EPlayerState, prevState, EPlayerState, newState);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FLivesCountEvent, int, prevLivesCount, int, newLivesCount);
 
 UCLASS()
@@ -52,6 +53,9 @@ protected:
 	EPlayerState m_PlayerState = EPlayerState::Normal;
 
 public:
+	UPROPERTY(BlueprintAssignable)
+	FPlayerStateChangedEvent OnStateChanged;
+
 	UPROPERTY(BlueprintAssignable)
 	FLivesCountEvent OnCurrentLivesCountChanged;
 

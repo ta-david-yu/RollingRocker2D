@@ -120,6 +120,8 @@ void AInGamePlayerState::SetPlayerState(EPlayerState playerState)
 {
 	EPlayerState prevState = m_PlayerState;
 	m_PlayerState = playerState;
+
+	OnStateChanged.Broadcast(prevState, m_PlayerState);
 }
 
 void AInGamePlayerState::handleOnRollingRockerPawnDied(FDeathEventData deathEventData)
