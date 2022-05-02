@@ -44,7 +44,6 @@ void AInGamePlayerState::BeginPlay()
 	}
 
 	m_RespawnLocationSelector->OnSelectionEnd.AddUniqueDynamic(this, &AInGamePlayerState::handleOnRespawnLocationSelectionEnd);
-	m_RespawnLocationSelector->SetActorHiddenInGame(true);
 }
 
 // Called every frame
@@ -76,7 +75,6 @@ void AInGamePlayerState::Tick(float deltaTime)
 			m_RollingRockerPawn->Rod->ResetLocation();
 
 			// Enable respawn location selector and setup timer
-			m_RespawnLocationSelector->SetActorHiddenInGame(false);
 			m_RespawnLocationSelector->StartSelection(GetPlayerController(), m_RollingRockerPawn->Rod);
 
 			SetPlayerState(EPlayerState::Respawning);
@@ -134,9 +132,6 @@ void AInGamePlayerState::handleOnRollingRockerPawnDied(FDeathEventData deathEven
 
 void AInGamePlayerState::handleOnRespawnLocationSelectionEnd(float locationOnRod)
 {
-	// TEMP
-	m_RespawnLocationSelector->SetActorHiddenInGame(true);
-
 	m_RollingRockerPawn->RespawnRocker(locationOnRod, ERockerMovementState::Constrained);
 
 	SetPlayerState(EPlayerState::Normal);
