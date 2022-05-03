@@ -14,7 +14,7 @@ struct FSelectionStartEventData
 	GENERATED_BODY()
 		
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class AInGamePlayerState* PlayerState;
+	class AInGamePlayerState* PlayerState = nullptr;
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSelectionStartEvent, FSelectionStartEventData, selectionStartEventData);

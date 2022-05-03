@@ -12,7 +12,7 @@ struct FPickUpData
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class AItemPickup* PickUp;
+	class AItemPickup* PickUp = nullptr;
 };
 
 // This class does not need to be modified.

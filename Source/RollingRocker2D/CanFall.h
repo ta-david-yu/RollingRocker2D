@@ -12,7 +12,7 @@ struct FFallDownData
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	AActor* TargetFallDownTo;
+	AActor* TargetFallDownTo = nullptr;
 };
 
 // This class does not need to be modified.
