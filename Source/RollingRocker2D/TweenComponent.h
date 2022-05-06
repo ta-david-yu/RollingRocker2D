@@ -33,8 +33,11 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float m_Duration = 1.0f;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float m_Delay = 0.0f;
+
 	UPROPERTY(BlueprintAssignable)
-	FTweenEvent OnTweenBegin;
+	FTweenEvent OnTweenDelayBegin;
 
 	UPROPERTY(BlueprintAssignable)
 	FTweenUpdateEvent OnTweenUpdate;
@@ -52,6 +55,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	bool m_IsPlaying = false;
 
+	UPROPERTY(BlueprintReadOnly)
+	bool m_HasDelay = false;
+
 public:	
 	// Sets default values for this component's properties
 	UTweenComponent();
@@ -67,6 +73,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	UTweenComponent* Tween();
 
+	UFUNCTION(BlueprintCallable)
+		void Terminate();
+
 private:
 	void play();
+	void terminateManually();
 };

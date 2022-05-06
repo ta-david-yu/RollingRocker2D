@@ -38,39 +38,79 @@ void UTweenComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 		return;
 	}
 
-
-	if (m_Timer < m_Duration)
+	if (m_HasDelay)
 	{
-		m_Timer += DeltaTime;
-		float tProgress = FMath::Clamp(m_Timer / m_Duration, 0, 1);
-
-		if (m_TweenCurve->IsValidLowLevelFast())
+		// Do delay logic
+		if (m_Timer < m_Delay)
 		{
-			float progress = m_TweenCurve->GetFloatValue(tProgress);
-			OnTweenUpdate.Broadcast(progress);
+			m_Timer += DeltaTime;
+			return;
 		}
 		else
 		{
-			OnTweenUpdate.Broadcast(tProgress);
+			m_HasDelay = false;
+			m_Timer -= m_Delay;
+			OnTweenDelayBegin.Broadcast();
 		}
+	}
 
-		if (m_Timer >= m_Duration)
-		{
-			OnTweenEnd.Broadcast();
+	if (m_Timer >= m_Duration)
+	{
+		return;
+	}
 
-			m_IsPlaying = false;
-		}
+	m_Timer += DeltaTime;
+	float tProgress = FMath::Clamp(m_Timer / m_Duration, 0, 1);
+
+	if (m_TweenCurve->IsValidLowLevelFast())
+	{
+		float progress = m_TweenCurve->GetFloatValue(tProgress);
+		OnTweenUpdate.Broadcast(progress);
+	}
+	else
+	{
+		OnTweenUpdate.Broadcast(tProgress);
+	}
+
+	if (m_Timer >= m_Duration)
+	{
+		OnTweenEnd.Broadcast();
+
+		m_IsPlaying = false;
 	}
 }
 
 UTweenComponent* UTweenComponent::Tween()
 {
+	if (m_Delay > 0.0f)
+	{
+		m_HasDelay = true;
+	}
+	else
+	{
+		m_HasDelay = false;
+	}
+
 	play();
 	return this;
+}
+
+void UTweenComponent::Terminate()
+{
+	terminateManually();
 }
 
 void UTweenComponent::play()
 {
 	m_IsPlaying = true;
 	m_Timer = 0.0f;
+}
+
+void UTweenComponent::terminateManually()
+{
+	m_IsPlaying = false;
+	m_Timer = 0.0f;
+
+	OnTweenTerminated.Broadcast();
+	OnTweenEnd.Broadcast();
 }
