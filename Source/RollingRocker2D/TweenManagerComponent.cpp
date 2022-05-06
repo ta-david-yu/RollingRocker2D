@@ -101,6 +101,21 @@ void UTweener::Update(float timeStep)
 	}
 }
 
+void UTweener::AbortWithEndCallback()
+{
+	if (IsActive)
+	{
+		ExecuteEnd();
+	}
+
+	IsActive = false;
+}
+
+void UTweener::AbortWithoutEndCallback()
+{
+	IsActive = false;
+}
+
 // Sets default values for this component's properties
 UTweenManagerComponent::UTweenManagerComponent()
 {

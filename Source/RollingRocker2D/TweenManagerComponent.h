@@ -40,6 +40,12 @@ public:
 	void InitForUse(FTweenUpdateDynamicDelegate const& updateDelegate);
 	void InitForUse(TFunction<void(float)>&& updateCallback);
 	void Update(float timeStep);
+	
+	UFUNCTION(BlueprintCallable)
+	void AbortWithEndCallback();
+		
+	UFUNCTION(BlueprintCallable)
+	void AbortWithoutEndCallback();
 
 	UFUNCTION(BlueprintCallable)
 	UTweener* SetDuration(float duration) { Duration = duration; return this; }
