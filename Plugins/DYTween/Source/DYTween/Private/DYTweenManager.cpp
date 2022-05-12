@@ -170,6 +170,11 @@ void DYTweenManager::SafeAbort(UDYTweener*& tweener, bool withEndCallback)
 	tweener = nullptr;
 }
 
+void DYTweenManager::Clear()
+{
+	m_Tweeners.Empty();
+}
+
 UDYTweener* DYTweenManager::getInactiveTweener()
 {
 	for (auto& tweener : m_Tweeners)

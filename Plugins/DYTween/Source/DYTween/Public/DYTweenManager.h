@@ -134,6 +134,8 @@ public:
 
 	void SafeAbort(UDYTweener*& tweener, bool withEndCallback = true);
 
+	void Clear();
+
 private:
 	UDYTweener* getInactiveTweener();
 };
