@@ -144,6 +144,8 @@ public:
 
 	UTweener* Tween(TFunction<void(float)>&& updateCallback);
 
+	void SafeAbort(UTweener*& tweener, bool withEndCallback = true);
+
 private:
 	UTweener* getInactiveTweener();
 };

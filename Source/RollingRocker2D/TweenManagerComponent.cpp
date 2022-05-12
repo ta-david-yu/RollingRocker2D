@@ -177,6 +177,23 @@ UTweener* UTweenManagerComponent::Tween(TFunction<void(float)>&& updateCallback)
 	return tweener;
 }
 
+void UTweenManagerComponent::SafeAbort(UTweener*& tweener, bool withEndCallback)
+{
+	if (tweener != nullptr)
+	{
+		if (withEndCallback)
+		{
+			tweener->AbortWithEndCallback();
+		}
+		else
+		{
+			tweener->AbortWithoutEndCallback();
+		}
+	}
+
+	tweener = nullptr;
+}
+
 UTweener* UTweenManagerComponent::getInactiveTweener()
 {
 	for (auto& tweener : m_Tweeners)

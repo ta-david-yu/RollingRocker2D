@@ -7,7 +7,6 @@
 #include "RollingRockerPawn.h"
 #include "ScrollActorLocationOnMoveForward.generated.h"
 
-
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ROLLINGROCKER2D_API UScrollActorLocationOnMoveForward : public UActorComponent
 {
@@ -40,6 +39,13 @@ protected:
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+public:
+	UFUNCTION(BlueprintCallable)
+	float GetAutoScrollSpeedMultiplier() const { return m_AutoScrollSpeedMultiplier; }
+
+	UFUNCTION(BlueprintCallable)
+	void SetAutoScrollSpeedMultiplier(float multiplier) { m_AutoScrollSpeedMultiplier = multiplier; }
 
 	UFUNCTION(BlueprintCallable)
 	void HandleOnMoveForward(FMoveForwardEventData moveForwardEventData);
