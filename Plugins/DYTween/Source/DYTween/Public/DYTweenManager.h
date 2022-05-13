@@ -25,8 +25,8 @@ public:
 	UCurveFloat* Curve = nullptr;
     float Duration = 1.0f;
 
-	FTweenUpdateDelegate UpdateDelegate;
-	FTweenEndDelegate EndDelegate;
+	FTweenUpdateDelegate UpdateDelegate{};
+	FTweenEndDelegate EndDelegate{};
 
 	FTweenUpdateDynamicDelegate UpdateDynamicDelegate;
 	FTweenEndDynamicDelegate EndDynamicDelegate;

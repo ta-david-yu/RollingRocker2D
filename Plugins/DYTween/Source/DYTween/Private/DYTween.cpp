@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "DYTween.h"
+#include "DYGlobalTween.h"
 
 #define LOCTEXT_NAMESPACE "FDYTweenModule"
 
@@ -13,6 +14,7 @@ void FDYTweenModule::ShutdownModule()
 {
 	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
 	// we call this function before unloading the module.
+	UDYGlobalTween::ClearAllTween();
 }
 
 #undef LOCTEXT_NAMESPACE

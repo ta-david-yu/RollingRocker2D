@@ -14,7 +14,7 @@ void UDYTweener::InitForUse(FTweenUpdateDelegate const& updateDelegate)
 	Curve = nullptr;
 	Duration = 1.0f;
 
-	UpdateDelegate = FTweenUpdateDelegate{ updateDelegate };
+	UpdateDelegate = FTweenUpdateDelegate{updateDelegate};
 	EndDelegate.Unbind();
 
 	UpdateDynamicDelegate.Unbind();
@@ -37,7 +37,7 @@ void UDYTweener::InitForUse(FTweenUpdateDynamicDelegate const& updateDelegate)
 	UpdateDelegate.Unbind();
 	EndDelegate.Unbind();
 
-	UpdateDynamicDelegate = FTweenUpdateDynamicDelegate{ updateDelegate };
+	UpdateDynamicDelegate = FTweenUpdateDynamicDelegate{updateDelegate};
 	EndDynamicDelegate.Unbind();
 
 	UpdateCallback = nullptr;
@@ -186,6 +186,7 @@ UDYTweener* DYTweenManager::getInactiveTweener()
 	}
 
 	UDYTweener* newTweener = NewObject<UDYTweener>();
+	newTweener->AddToRoot();
 	m_Tweeners.Add(newTweener);
 
 	return newTweener;
