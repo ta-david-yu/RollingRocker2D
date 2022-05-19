@@ -2,6 +2,7 @@
 
 
 #include "FallAnimationController.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
 UFallAnimationController::UFallAnimationController()
@@ -73,6 +74,12 @@ void UFallAnimationController::PlayFallAnimationOnSceneComponent(USceneComponent
 	m_Gravity = gravity;
 
 	m_ScaleTimer = 0;
+
+	if (OnFallSound->IsValidLowLevelFast())
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), OnFallSound);
+	}
+
 	OnAnimationBegin.Broadcast(sceneComponent);
 }
 

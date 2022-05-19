@@ -17,6 +17,9 @@ class ROLLINGROCKER2D_API UFallAnimationController : public UActorComponent
 
 public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	TObjectPtr<USoundBase> OnFallSound = nullptr;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	float ScaleToZeroTime = 1.0f;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
