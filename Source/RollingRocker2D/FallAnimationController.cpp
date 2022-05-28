@@ -74,7 +74,6 @@ void UFallAnimationController::PlayFallAnimationOnSceneComponent(USceneComponent
 	m_Gravity = gravity;
 
 	m_ScaleTimer = 0;
-
 	if (OnFallSound->IsValidLowLevelFast())
 	{
 		UGameplayStatics::PlaySound2D(GetWorld(), OnFallSound);
